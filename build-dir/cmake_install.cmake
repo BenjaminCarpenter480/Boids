@@ -1,4 +1,4 @@
-# Install script for directory: /home/benjamin/Desktop/SpaceObject/GLProj
+# Install script for directory: /home/benjamin/Desktop/OpenGL
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -39,8 +39,8 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glfw-3.3.2/cmake_install.cmake")
-  include("/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glew-2.1.0/build/cmake/cmake_install.cmake")
+  include("/home/benjamin/Desktop/OpenGL/build-dir/glfw-3.3.2/cmake_install.cmake")
+  include("/home/benjamin/Desktop/OpenGL/build-dir/glew-2.1.0/build/cmake/cmake_install.cmake")
 
 endif()
 
@@ -52,5 +52,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/benjamin/Desktop/OpenGL/build-dir/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

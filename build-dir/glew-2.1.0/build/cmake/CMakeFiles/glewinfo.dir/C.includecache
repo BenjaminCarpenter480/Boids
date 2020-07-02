@@ -46,7 +46,7 @@ GL/glew.h
 windows.h
 -
 
-/home/benjamin/Desktop/SpaceObject/GLProj/glew-2.1.0/src/glewinfo.c
+/home/benjamin/Desktop/OpenGL/glew-2.1.0/src/glewinfo.c
 stdio.h
 -
 stdlib.h

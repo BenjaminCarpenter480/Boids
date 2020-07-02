@@ -1,4 +1,4 @@
-# Install script for directory: /home/benjamin/Desktop/SpaceObject/GLProj/glew-2.1.0/build/cmake
+# Install script for directory: /home/benjamin/Desktop/OpenGL/glew-2.1.0/build/cmake
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -38,7 +38,7 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/lib/libGLEWd.a")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "/home/benjamin/Desktop/OpenGL/build-dir/lib/libGLEWd.a")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
@@ -48,12 +48,12 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
          FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/glewinfo"
          RPATH "")
   endif()
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/bin/glewinfo")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "/home/benjamin/Desktop/OpenGL/build-dir/bin/glewinfo")
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/glewinfo" AND
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/glewinfo")
     file(RPATH_CHANGE
          FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/glewinfo"
-         OLD_RPATH "/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/lib:"
+         OLD_RPATH "/home/benjamin/Desktop/OpenGL/build-dir/lib:"
          NEW_RPATH "")
     if(CMAKE_INSTALL_DO_STRIP)
       execute_process(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/glewinfo")
@@ -68,12 +68,12 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
          FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/visualinfo"
          RPATH "")
   endif()
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/bin/visualinfo")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "/home/benjamin/Desktop/OpenGL/build-dir/bin/visualinfo")
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/visualinfo" AND
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/visualinfo")
     file(RPATH_CHANGE
          FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/visualinfo"
-         OLD_RPATH "/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/lib:"
+         OLD_RPATH "/home/benjamin/Desktop/OpenGL/build-dir/lib:"
          NEW_RPATH "")
     if(CMAKE_INSTALL_DO_STRIP)
       execute_process(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/visualinfo")
@@ -82,14 +82,14 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/benjamin/Desktop/SpaceObject/GLProj/glew-2.1.0/build/cmake/../../glew.pc")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/benjamin/Desktop/OpenGL/glew-2.1.0/build/cmake/../../glew.pc")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include/GL" TYPE FILE FILES
-    "/home/benjamin/Desktop/SpaceObject/GLProj/glew-2.1.0/build/cmake/../../include/GL/wglew.h"
-    "/home/benjamin/Desktop/SpaceObject/GLProj/glew-2.1.0/build/cmake/../../include/GL/glew.h"
-    "/home/benjamin/Desktop/SpaceObject/GLProj/glew-2.1.0/build/cmake/../../include/GL/glxew.h"
+    "/home/benjamin/Desktop/OpenGL/glew-2.1.0/build/cmake/../../include/GL/wglew.h"
+    "/home/benjamin/Desktop/OpenGL/glew-2.1.0/build/cmake/../../include/GL/glew.h"
+    "/home/benjamin/Desktop/OpenGL/glew-2.1.0/build/cmake/../../include/GL/glxew.h"
     )
 endif()
 
@@ -97,7 +97,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/cmake/glew/glew-targets.cmake")
     file(DIFFERENT EXPORT_FILE_CHANGED FILES
          "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/cmake/glew/glew-targets.cmake"
-         "/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glew-2.1.0/build/cmake/CMakeFiles/Export/lib/cmake/glew/glew-targets.cmake")
+         "/home/benjamin/Desktop/OpenGL/build-dir/glew-2.1.0/build/cmake/CMakeFiles/Export/lib/cmake/glew/glew-targets.cmake")
     if(EXPORT_FILE_CHANGED)
       file(GLOB OLD_CONFIG_FILES "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/cmake/glew/glew-targets-*.cmake")
       if(OLD_CONFIG_FILES)
@@ -106,16 +106,16 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
       endif()
     endif()
   endif()
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/glew" TYPE FILE FILES "/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glew-2.1.0/build/cmake/CMakeFiles/Export/lib/cmake/glew/glew-targets.cmake")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/glew" TYPE FILE FILES "/home/benjamin/Desktop/OpenGL/build-dir/glew-2.1.0/build/cmake/CMakeFiles/Export/lib/cmake/glew/glew-targets.cmake")
   if("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^([Dd][Ee][Bb][Uu][Gg])$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/glew" TYPE FILE FILES "/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glew-2.1.0/build/cmake/CMakeFiles/Export/lib/cmake/glew/glew-targets-debug.cmake")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/glew" TYPE FILE FILES "/home/benjamin/Desktop/OpenGL/build-dir/glew-2.1.0/build/cmake/CMakeFiles/Export/lib/cmake/glew/glew-targets-debug.cmake")
   endif()
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/glew" TYPE FILE FILES
-    "/home/benjamin/Desktop/SpaceObject/GLProj/glew-2.1.0/build/cmake/glew-config.cmake"
-    "/home/benjamin/Desktop/SpaceObject/GLProj/glew-2.1.0/build/cmake/CopyImportedTargetProperties.cmake"
+    "/home/benjamin/Desktop/OpenGL/glew-2.1.0/build/cmake/glew-config.cmake"
+    "/home/benjamin/Desktop/OpenGL/glew-2.1.0/build/cmake/CopyImportedTargetProperties.cmake"
     )
 endif()
 

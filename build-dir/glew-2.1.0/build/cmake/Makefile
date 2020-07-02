@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/benjamin/Desktop/SpaceObject/GLProj
+CMAKE_SOURCE_DIR = /home/benjamin/Desktop/OpenGL
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/benjamin/Desktop/SpaceObject/GLProj/build-dir
+CMAKE_BINARY_DIR = /home/benjamin/Desktop/OpenGL/build-dir
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -126,14 +126,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(CMAKE_COMMAND) -E cmake_progress_start /home/benjamin/Desktop/SpaceObject/GLProj/build-dir/CMakeFiles /home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glew-2.1.0/build/cmake/CMakeFiles/progress.marks
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f CMakeFiles/Makefile2 glew-2.1.0/build/cmake/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benjamin/Desktop/SpaceObject/GLProj/build-dir/CMakeFiles 0
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(CMAKE_COMMAND) -E cmake_progress_start /home/benjamin/Desktop/OpenGL/build-dir/CMakeFiles /home/benjamin/Desktop/OpenGL/build-dir/glew-2.1.0/build/cmake/CMakeFiles/progress.marks
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f CMakeFiles/Makefile2 glew-2.1.0/build/cmake/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benjamin/Desktop/OpenGL/build-dir/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f CMakeFiles/Makefile2 glew-2.1.0/build/cmake/clean
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f CMakeFiles/Makefile2 glew-2.1.0/build/cmake/clean
 .PHONY : clean
 
 # The main clean target
@@ -143,22 +143,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f CMakeFiles/Makefile2 glew-2.1.0/build/cmake/preinstall
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f CMakeFiles/Makefile2 glew-2.1.0/build/cmake/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f CMakeFiles/Makefile2 glew-2.1.0/build/cmake/preinstall
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f CMakeFiles/Makefile2 glew-2.1.0/build/cmake/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 glew-2.1.0/build/cmake/CMakeFiles/glew.dir/rule:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f CMakeFiles/Makefile2 glew-2.1.0/build/cmake/CMakeFiles/glew.dir/rule
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f CMakeFiles/Makefile2 glew-2.1.0/build/cmake/CMakeFiles/glew.dir/rule
 .PHONY : glew-2.1.0/build/cmake/CMakeFiles/glew.dir/rule
 
 # Convenience name for target.
@@ -168,12 +168,12 @@ glew: glew-2.1.0/build/cmake/CMakeFiles/glew.dir/rule
 
 # fast build rule for target.
 glew/fast:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glew.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glew.dir/build
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glew.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glew.dir/build
 .PHONY : glew/fast
 
 # Convenience name for target.
 glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/rule:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f CMakeFiles/Makefile2 glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/rule
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f CMakeFiles/Makefile2 glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/rule
 .PHONY : glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/rule
 
 # Convenience name for target.
@@ -183,12 +183,12 @@ glewinfo: glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/rule
 
 # fast build rule for target.
 glewinfo/fast:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/build
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/build
 .PHONY : glewinfo/fast
 
 # Convenience name for target.
 glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/rule:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f CMakeFiles/Makefile2 glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/rule
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f CMakeFiles/Makefile2 glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/rule
 .PHONY : glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/rule
 
 # Convenience name for target.
@@ -198,12 +198,12 @@ visualinfo: glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/rule
 
 # fast build rule for target.
 visualinfo/fast:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/build
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/build
 .PHONY : visualinfo/fast
 
 # Convenience name for target.
 glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/rule:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f CMakeFiles/Makefile2 glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/rule
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f CMakeFiles/Makefile2 glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/rule
 .PHONY : glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/rule
 
 # Convenience name for target.
@@ -213,7 +213,7 @@ glew_s: glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/rule
 
 # fast build rule for target.
 glew_s/fast:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/build
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/build
 .PHONY : glew_s/fast
 
 __/__/src/glew.o: __/__/src/glew.c.o
@@ -222,8 +222,8 @@ __/__/src/glew.o: __/__/src/glew.c.o
 
 # target to build an object file
 __/__/src/glew.c.o:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glew.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glew.dir/__/__/src/glew.c.o
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/__/__/src/glew.c.o
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glew.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glew.dir/__/__/src/glew.c.o
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/__/__/src/glew.c.o
 .PHONY : __/__/src/glew.c.o
 
 __/__/src/glew.i: __/__/src/glew.c.i
@@ -232,8 +232,8 @@ __/__/src/glew.i: __/__/src/glew.c.i
 
 # target to preprocess a source file
 __/__/src/glew.c.i:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glew.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glew.dir/__/__/src/glew.c.i
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/__/__/src/glew.c.i
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glew.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glew.dir/__/__/src/glew.c.i
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/__/__/src/glew.c.i
 .PHONY : __/__/src/glew.c.i
 
 __/__/src/glew.s: __/__/src/glew.c.s
@@ -242,8 +242,8 @@ __/__/src/glew.s: __/__/src/glew.c.s
 
 # target to generate assembly for a file
 __/__/src/glew.c.s:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glew.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glew.dir/__/__/src/glew.c.s
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/__/__/src/glew.c.s
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glew.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glew.dir/__/__/src/glew.c.s
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/__/__/src/glew.c.s
 .PHONY : __/__/src/glew.c.s
 
 __/__/src/glewinfo.o: __/__/src/glewinfo.c.o
@@ -252,7 +252,7 @@ __/__/src/glewinfo.o: __/__/src/glewinfo.c.o
 
 # target to build an object file
 __/__/src/glewinfo.c.o:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/__/__/src/glewinfo.c.o
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/__/__/src/glewinfo.c.o
 .PHONY : __/__/src/glewinfo.c.o
 
 __/__/src/glewinfo.i: __/__/src/glewinfo.c.i
@@ -261,7 +261,7 @@ __/__/src/glewinfo.i: __/__/src/glewinfo.c.i
 
 # target to preprocess a source file
 __/__/src/glewinfo.c.i:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/__/__/src/glewinfo.c.i
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/__/__/src/glewinfo.c.i
 .PHONY : __/__/src/glewinfo.c.i
 
 __/__/src/glewinfo.s: __/__/src/glewinfo.c.s
@@ -270,7 +270,7 @@ __/__/src/glewinfo.s: __/__/src/glewinfo.c.s
 
 # target to generate assembly for a file
 __/__/src/glewinfo.c.s:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/__/__/src/glewinfo.c.s
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/glewinfo.dir/__/__/src/glewinfo.c.s
 .PHONY : __/__/src/glewinfo.c.s
 
 __/__/src/visualinfo.o: __/__/src/visualinfo.c.o
@@ -279,7 +279,7 @@ __/__/src/visualinfo.o: __/__/src/visualinfo.c.o
 
 # target to build an object file
 __/__/src/visualinfo.c.o:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/__/__/src/visualinfo.c.o
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/__/__/src/visualinfo.c.o
 .PHONY : __/__/src/visualinfo.c.o
 
 __/__/src/visualinfo.i: __/__/src/visualinfo.c.i
@@ -288,7 +288,7 @@ __/__/src/visualinfo.i: __/__/src/visualinfo.c.i
 
 # target to preprocess a source file
 __/__/src/visualinfo.c.i:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/__/__/src/visualinfo.c.i
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/__/__/src/visualinfo.c.i
 .PHONY : __/__/src/visualinfo.c.i
 
 __/__/src/visualinfo.s: __/__/src/visualinfo.c.s
@@ -297,7 +297,7 @@ __/__/src/visualinfo.s: __/__/src/visualinfo.c.s
 
 # target to generate assembly for a file
 __/__/src/visualinfo.c.s:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/__/__/src/visualinfo.c.s
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(MAKE) -f glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/build.make glew-2.1.0/build/cmake/CMakeFiles/visualinfo.dir/__/__/src/visualinfo.c.s
 .PHONY : __/__/src/visualinfo.c.s
 
 # Help Target
@@ -336,6 +336,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

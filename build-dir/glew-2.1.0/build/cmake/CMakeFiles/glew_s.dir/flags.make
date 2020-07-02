@@ -6,5 +6,5 @@ C_FLAGS = -g
 
 C_DEFINES = -DGLEW_NO_GLU -DGLEW_STATIC
 
-C_INCLUDES = -I/home/benjamin/Desktop/SpaceObject/GLProj/glfw-3.3.2/include -I/home/benjamin/Desktop/SpaceObject/GLProj/glew-2.1.0/build/cmake/../../include 
+C_INCLUDES = -I/home/benjamin/Desktop/OpenGL/glfw-3.3.2/include -I/home/benjamin/Desktop/OpenGL/glew-2.1.0/build/cmake/../../include 
 

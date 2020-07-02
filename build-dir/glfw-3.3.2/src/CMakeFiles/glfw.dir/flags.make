@@ -6,7 +6,7 @@ C_FLAGS = -g -fPIC   -Wall -std=gnu99
 
 C_DEFINES = -D_GLFW_USE_CONFIG_H
 
-C_INCLUDES = -I/home/benjamin/Desktop/SpaceObject/GLProj/glfw-3.3.2/include -I/home/benjamin/Desktop/SpaceObject/GLProj/glfw-3.3.2/src -I/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glfw-3.3.2/src 
+C_INCLUDES = -I/home/benjamin/Desktop/OpenGL/glfw-3.3.2/include -I/home/benjamin/Desktop/OpenGL/glfw-3.3.2/src -I/home/benjamin/Desktop/OpenGL/build-dir/glfw-3.3.2/src 
 
 # Custom flags: glfw-3.3.2/src/CMakeFiles/glfw.dir/context.c.o_FLAGS = -Wdeclaration-after-statement
 

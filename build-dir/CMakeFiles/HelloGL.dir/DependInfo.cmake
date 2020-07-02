@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/benjamin/Desktop/SpaceObject/GLProj/main.cpp" "/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/CMakeFiles/HelloGL.dir/main.cpp.o"
+  "/home/benjamin/Desktop/OpenGL/main.cpp" "/home/benjamin/Desktop/OpenGL/build-dir/CMakeFiles/HelloGL.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
@@ -16,8 +16,8 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
 
 # Targets to which this target links.
 set(CMAKE_TARGET_LINKED_INFO_FILES
-  "/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glew-2.1.0/build/cmake/CMakeFiles/glew.dir/DependInfo.cmake"
-  "/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glfw-3.3.2/src/CMakeFiles/glfw.dir/DependInfo.cmake"
+  "/home/benjamin/Desktop/OpenGL/build-dir/glew-2.1.0/build/cmake/CMakeFiles/glew.dir/DependInfo.cmake"
+  "/home/benjamin/Desktop/OpenGL/build-dir/glfw-3.3.2/src/CMakeFiles/glfw.dir/DependInfo.cmake"
   )
 
 # Fortran module output directory.

@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/benjamin/Desktop/SpaceObject/GLProj
+CMAKE_SOURCE_DIR = /home/benjamin/Desktop/OpenGL
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/benjamin/Desktop/SpaceObject/GLProj/build-dir
+CMAKE_BINARY_DIR = /home/benjamin/Desktop/OpenGL/build-dir
 
 # Include any dependencies generated for this target.
 include glew-2.1.0/build/cmake/CMakeFiles/glew.dir/depend.make
@@ -59,16 +59,16 @@ include glew-2.1.0/build/cmake/CMakeFiles/glew.dir/flags.make
 
 glew-2.1.0/build/cmake/CMakeFiles/glew.dir/__/__/src/glew.c.o: glew-2.1.0/build/cmake/CMakeFiles/glew.dir/flags.make
 glew-2.1.0/build/cmake/CMakeFiles/glew.dir/__/__/src/glew.c.o: ../glew-2.1.0/src/glew.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object glew-2.1.0/build/cmake/CMakeFiles/glew.dir/__/__/src/glew.c.o"
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glew-2.1.0/build/cmake && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/glew.dir/__/__/src/glew.c.o   -c /home/benjamin/Desktop/SpaceObject/GLProj/glew-2.1.0/src/glew.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/benjamin/Desktop/OpenGL/build-dir/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object glew-2.1.0/build/cmake/CMakeFiles/glew.dir/__/__/src/glew.c.o"
+	cd /home/benjamin/Desktop/OpenGL/build-dir/glew-2.1.0/build/cmake && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/glew.dir/__/__/src/glew.c.o   -c /home/benjamin/Desktop/OpenGL/glew-2.1.0/src/glew.c
 
 glew-2.1.0/build/cmake/CMakeFiles/glew.dir/__/__/src/glew.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/glew.dir/__/__/src/glew.c.i"
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glew-2.1.0/build/cmake && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/benjamin/Desktop/SpaceObject/GLProj/glew-2.1.0/src/glew.c > CMakeFiles/glew.dir/__/__/src/glew.c.i
+	cd /home/benjamin/Desktop/OpenGL/build-dir/glew-2.1.0/build/cmake && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/benjamin/Desktop/OpenGL/glew-2.1.0/src/glew.c > CMakeFiles/glew.dir/__/__/src/glew.c.i
 
 glew-2.1.0/build/cmake/CMakeFiles/glew.dir/__/__/src/glew.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/glew.dir/__/__/src/glew.c.s"
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glew-2.1.0/build/cmake && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/benjamin/Desktop/SpaceObject/GLProj/glew-2.1.0/src/glew.c -o CMakeFiles/glew.dir/__/__/src/glew.c.s
+	cd /home/benjamin/Desktop/OpenGL/build-dir/glew-2.1.0/build/cmake && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/benjamin/Desktop/OpenGL/glew-2.1.0/src/glew.c -o CMakeFiles/glew.dir/__/__/src/glew.c.s
 
 glew-2.1.0/build/cmake/CMakeFiles/glew.dir/__/__/src/glew.c.o.requires:
 
@@ -93,9 +93,9 @@ lib/libGLEWd.so.2.1.0: glew-2.1.0/build/cmake/CMakeFiles/glew.dir/build.make
 lib/libGLEWd.so.2.1.0: /usr/lib/x86_64-linux-gnu/libGL.so
 lib/libGLEWd.so.2.1.0: /usr/lib/x86_64-linux-gnu/libGLU.so
 lib/libGLEWd.so.2.1.0: glew-2.1.0/build/cmake/CMakeFiles/glew.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C shared library ../../../lib/libGLEWd.so"
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glew-2.1.0/build/cmake && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/glew.dir/link.txt --verbose=$(VERBOSE)
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glew-2.1.0/build/cmake && $(CMAKE_COMMAND) -E cmake_symlink_library ../../../lib/libGLEWd.so.2.1.0 ../../../lib/libGLEWd.so.2.1 ../../../lib/libGLEWd.so
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/benjamin/Desktop/OpenGL/build-dir/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C shared library ../../../lib/libGLEWd.so"
+	cd /home/benjamin/Desktop/OpenGL/build-dir/glew-2.1.0/build/cmake && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/glew.dir/link.txt --verbose=$(VERBOSE)
+	cd /home/benjamin/Desktop/OpenGL/build-dir/glew-2.1.0/build/cmake && $(CMAKE_COMMAND) -E cmake_symlink_library ../../../lib/libGLEWd.so.2.1.0 ../../../lib/libGLEWd.so.2.1 ../../../lib/libGLEWd.so
 
 lib/libGLEWd.so.2.1: lib/libGLEWd.so.2.1.0
 	@$(CMAKE_COMMAND) -E touch_nocreate lib/libGLEWd.so.2.1
@@ -113,10 +113,10 @@ glew-2.1.0/build/cmake/CMakeFiles/glew.dir/requires: glew-2.1.0/build/cmake/CMak
 .PHONY : glew-2.1.0/build/cmake/CMakeFiles/glew.dir/requires
 
 glew-2.1.0/build/cmake/CMakeFiles/glew.dir/clean:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glew-2.1.0/build/cmake && $(CMAKE_COMMAND) -P CMakeFiles/glew.dir/cmake_clean.cmake
+	cd /home/benjamin/Desktop/OpenGL/build-dir/glew-2.1.0/build/cmake && $(CMAKE_COMMAND) -P CMakeFiles/glew.dir/cmake_clean.cmake
 .PHONY : glew-2.1.0/build/cmake/CMakeFiles/glew.dir/clean
 
 glew-2.1.0/build/cmake/CMakeFiles/glew.dir/depend:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/benjamin/Desktop/SpaceObject/GLProj /home/benjamin/Desktop/SpaceObject/GLProj/glew-2.1.0/build/cmake /home/benjamin/Desktop/SpaceObject/GLProj/build-dir /home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glew-2.1.0/build/cmake /home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glew-2.1.0/build/cmake/CMakeFiles/glew.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/benjamin/Desktop/OpenGL /home/benjamin/Desktop/OpenGL/glew-2.1.0/build/cmake /home/benjamin/Desktop/OpenGL/build-dir /home/benjamin/Desktop/OpenGL/build-dir/glew-2.1.0/build/cmake /home/benjamin/Desktop/OpenGL/build-dir/glew-2.1.0/build/cmake/CMakeFiles/glew.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : glew-2.1.0/build/cmake/CMakeFiles/glew.dir/depend
 
