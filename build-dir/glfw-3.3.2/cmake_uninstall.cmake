@@ -1,9 +1,9 @@
 
-if (NOT EXISTS "/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glfw-3.3.2/install_manifest.txt")
-  message(FATAL_ERROR "Cannot find install manifest: \"/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glfw-3.3.2/install_manifest.txt\"")
+if (NOT EXISTS "/home/benjamin/Desktop/OpenGL/build-dir/glfw-3.3.2/install_manifest.txt")
+  message(FATAL_ERROR "Cannot find install manifest: \"/home/benjamin/Desktop/OpenGL/build-dir/glfw-3.3.2/install_manifest.txt\"")
 endif()
 
-file(READ "/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glfw-3.3.2/install_manifest.txt" files)
+file(READ "/home/benjamin/Desktop/OpenGL/build-dir/glfw-3.3.2/install_manifest.txt" files)
 string(REGEX REPLACE "\n" ";" files "${files}")
 
 foreach (file ${files})

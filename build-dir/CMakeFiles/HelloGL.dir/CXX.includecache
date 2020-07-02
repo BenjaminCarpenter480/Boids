@@ -66,15 +66,15 @@ GL/glext.h
 GL/glu.h
 -
 
-/home/benjamin/Desktop/SpaceObject/GLProj/main.cpp
+/home/benjamin/Desktop/OpenGL/main.cpp
 iostream
 -
 GL/glew.h
-/home/benjamin/Desktop/SpaceObject/GLProj/GL/glew.h
+/home/benjamin/Desktop/OpenGL/GL/glew.h
 GL/glut.h
-/home/benjamin/Desktop/SpaceObject/GLProj/GL/glut.h
+/home/benjamin/Desktop/OpenGL/GL/glut.h
 GLFW/glfw3.h
-/home/benjamin/Desktop/SpaceObject/GLProj/GLFW/glfw3.h
+/home/benjamin/Desktop/OpenGL/GLFW/glfw3.h
 fstream
 -
 string

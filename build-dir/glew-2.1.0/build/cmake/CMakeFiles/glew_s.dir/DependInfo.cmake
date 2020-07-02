@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "/home/benjamin/Desktop/SpaceObject/GLProj/glew-2.1.0/src/glew.c" "/home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/__/__/src/glew.c.o"
+  "/home/benjamin/Desktop/OpenGL/glew-2.1.0/src/glew.c" "/home/benjamin/Desktop/OpenGL/build-dir/glew-2.1.0/build/cmake/CMakeFiles/glew_s.dir/__/__/src/glew.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

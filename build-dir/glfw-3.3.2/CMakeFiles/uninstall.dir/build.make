@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/benjamin/Desktop/SpaceObject/GLProj
+CMAKE_SOURCE_DIR = /home/benjamin/Desktop/OpenGL
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/benjamin/Desktop/SpaceObject/GLProj/build-dir
+CMAKE_BINARY_DIR = /home/benjamin/Desktop/OpenGL/build-dir
 
 # Utility rule file for uninstall.
 
@@ -54,7 +54,7 @@ CMAKE_BINARY_DIR = /home/benjamin/Desktop/SpaceObject/GLProj/build-dir
 include glfw-3.3.2/CMakeFiles/uninstall.dir/progress.make
 
 glfw-3.3.2/CMakeFiles/uninstall:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glfw-3.3.2 && /usr/bin/cmake -P /home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glfw-3.3.2/cmake_uninstall.cmake
+	cd /home/benjamin/Desktop/OpenGL/build-dir/glfw-3.3.2 && /usr/bin/cmake -P /home/benjamin/Desktop/OpenGL/build-dir/glfw-3.3.2/cmake_uninstall.cmake
 
 uninstall: glfw-3.3.2/CMakeFiles/uninstall
 uninstall: glfw-3.3.2/CMakeFiles/uninstall.dir/build.make
@@ -67,10 +67,10 @@ glfw-3.3.2/CMakeFiles/uninstall.dir/build: uninstall
 .PHONY : glfw-3.3.2/CMakeFiles/uninstall.dir/build
 
 glfw-3.3.2/CMakeFiles/uninstall.dir/clean:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glfw-3.3.2 && $(CMAKE_COMMAND) -P CMakeFiles/uninstall.dir/cmake_clean.cmake
+	cd /home/benjamin/Desktop/OpenGL/build-dir/glfw-3.3.2 && $(CMAKE_COMMAND) -P CMakeFiles/uninstall.dir/cmake_clean.cmake
 .PHONY : glfw-3.3.2/CMakeFiles/uninstall.dir/clean
 
 glfw-3.3.2/CMakeFiles/uninstall.dir/depend:
-	cd /home/benjamin/Desktop/SpaceObject/GLProj/build-dir && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/benjamin/Desktop/SpaceObject/GLProj /home/benjamin/Desktop/SpaceObject/GLProj/glfw-3.3.2 /home/benjamin/Desktop/SpaceObject/GLProj/build-dir /home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glfw-3.3.2 /home/benjamin/Desktop/SpaceObject/GLProj/build-dir/glfw-3.3.2/CMakeFiles/uninstall.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/benjamin/Desktop/OpenGL/build-dir && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/benjamin/Desktop/OpenGL /home/benjamin/Desktop/OpenGL/glfw-3.3.2 /home/benjamin/Desktop/OpenGL/build-dir /home/benjamin/Desktop/OpenGL/build-dir/glfw-3.3.2 /home/benjamin/Desktop/OpenGL/build-dir/glfw-3.3.2/CMakeFiles/uninstall.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : glfw-3.3.2/CMakeFiles/uninstall.dir/depend
 
