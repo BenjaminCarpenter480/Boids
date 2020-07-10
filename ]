@@ -1,0 +1,69 @@
+/*
+ *
+ * TODO: RENAME position struct to vector
+ *
+ */
+
+
+#include <cmath>
+class testSim   {
+    private:
+        position * posL;
+        struct position {
+            double x;
+            double y;
+        }
+        unsigned float dt = 0.5;
+        void normalisePos() {
+            double maxDist = sqrt(pow(posL[0].x,2)+pow(posL[0].y,2)); 
+            for (int i = 1; i < sizeof(poL)/sizeof(position) ; i++) {
+                return -1;//TODO
+            }
+        }
+    public:
+        unsigned int numOfParticles;
+        const unsigned int dimensionality = 2;
+        double * getPosBuffer() {
+            //Returns a buffer from posL list
+        }
+
+
+        unsigned int findNearestNeighbour(unsigned int index)    {
+            double maxDist = sqrt(pow(posL[0].x,2)+pow(posL[0].y,2)); 
+            unsigned int nnIndex = 0
+            for (int i = 1; i < sizeof(poL)/sizeof(position) ; i++) {
+                double currentDist = sqrt(pow(posL[0].x,2)+pow(posL[0].y,2)))   
+                if (maxDist< currentDist)  {
+                    maxDist = currentDist;
+                    nnIndex = i;
+                }
+            }
+            return nnIndex;
+        }
+
+        position moveAwayDir(unsigned int x, unsigned int y)    {
+        //MOVE PERPENDICULAR TO Nearest neighbour
+            position retPos;
+            retPos.y = -1*x/y;
+            retPos.x = 1/sqrt(1+pow(retPos.y,2));
+            return retPos;
+        }
+
+
+        position moveAwayDir(position posAwayFrom)  {
+            return moveAwayDir(posAwayFrom.x,posAwayFrom.y)
+        }
+
+        
+        double * timeStep() {//Position updater function
+            for (int i= 0; i< sizeof(posL)/sizeof(position);i++)    {
+                nnIndex = findNearestNeighbourIndex(selfIndex);
+                posL[i] = posL[i]+moveAwayPos(posL[nnIndex].x,posL[nnIndex].y)*dt;
+            }
+        }
+
+        
+
+
+
+}

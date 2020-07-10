@@ -75,6 +75,8 @@ GL/glut.h
 /home/benjamin/Desktop/OpenGL/GL/glut.h
 GLFW/glfw3.h
 /home/benjamin/Desktop/OpenGL/GLFW/glfw3.h
+functional
+-
 fstream
 -
 string
@@ -87,4 +89,10 @@ iostream
 -
 GLWrap.h
 /home/benjamin/Desktop/OpenGL/GLWrap.h
+testSim.h
+/home/benjamin/Desktop/OpenGL/testSim.h
+
+/home/benjamin/Desktop/OpenGL/testSim.h
+cmath
+-
 
