@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_BUILD_TYPE Debug)
 
-add_executable(HelloGL main.cpp shader.shader)
+add_executable(HelloGL main.cpp GLWrap.h testSim.h shader.shader)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/shader.shader
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

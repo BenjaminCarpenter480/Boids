@@ -94,11 +94,6 @@ static unsigned int CreateShader(const std::string& vertexShader, const std::str
 
 int main()
 {
-    
-    unsigned int ParticlesCount = 20;
-    unsigned int MaxParticles = ParticlesCount;
-    
-    
     GLFWwindow* window;
     if (!glfwInit())    {
         return -1;
@@ -120,46 +115,38 @@ int main()
         return -1;
     }
     
-    float pos[] = {-0.5f,-0.5f,0.0f,
-                  0.0f, 0.5f,0.0f,
-                  0.5f,-0.5f,0.0f,
-                  0.5f,0.0,0.0f};
+    float pos[] = {-0.5f,-0.5f,
+                  0.0f, 0.5f,
+                  0.5f,-0.5f,
+    		  0.5f,0.0f};
+
+    unsigned int particleCount = 4;
+    unsigned int dimensionCount = 2;
+
+	
 
 
-    float vertex_pos[] = {-0.5f,-0.5f,0.0f,
-                  0.0f, 0.5f,0.0f,
-                  0.5f,-0.5f,0.0f,
-                  0.5f,0.0,0.0f};
 
 
-
-    unsigned int spaceBuffer; //Address of buffer
-    glGenBuffers(1,&spaceBuffer); //Gen single buffer with addr of buffer
+    ///////////////////////////
+    unsigned int buffer; //Address of buffer
+    glGenBuffers(1,&buffer); //Gen single buffer with addr of buffer
     
-    glBindBuffer(GL_ARRAY_BUFFER, spaceBuffer); //Select a buffer and tell some info on the buffer
+    glBindBuffer(GL_ARRAY_BUFFER, buffer); //Select a buffer and tell some info on the buffer
 
 
-    //Spec data of bufferglBufferData(GL_ARRAY_BUFFER,6*sizeof(float),NULL,GL_DYNAMIC_DRAW);
-    glBufferData(GL_ARRAY_BUFFER,sizeof(vertex_pos),vertex_pos,GL_STATIC_DRAW);
-     
-    /* once, accessed many and draw implying usage as drawing 'instruction'
-     */
-
-    unsigned int posBuffer;
-    glGenBuffers(1,&posBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
-    glBufferData(GL_ARRAY_BUFFER,MaxParticles*4*sizeof(GLfloat),NULL,GL_STREAM_DRAW);
-
-
-    unsigned int colBuffer;
-    glGenBuffers(1,&colBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER,colBuffer);
-    glBufferData(GL_ARRAY_BUFFER,MaxParticles*4*sizeof(GLubyte),NULL,GL_STREAM_DRAW);
+    //Spec data of buffer
     
+    glBufferData(GL_ARRAY_BUFFER,particleCount*dimensionCount*sizeof(float),NULL,GL_STREAM_DRAW);
+    /*Define the buffer size, items and type of accesses for the buffer e.g. static where data mod
+     * once, accessed many and draw implying usage as drawing 'instruction'
+   */
+    glBufferSubData(GL_ARRAY_BUFFER,0,particleCount*dimensionCount*sizeof(float),pos);
+
 
     glEnableVertexAttribArray(0);  //ENable below attrib
 
-    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(float)*3,0); //Define the attrib
+    glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,sizeof(float)*dimensionCount,0); //Define the attrib
     
         
     ShaderSourceCode source =ParseShader("shader.shader");
@@ -168,55 +155,71 @@ int main()
 
     unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
     glUseProgram(shader);
+    
 
     glBindBuffer(GL_ARRAY_BUFFER,0);  
     //lookup exactly what this is doing but think just selects or buffer defined above
-    
-    glVertexAttribDivisor(0, 0); // particles vertices : always reuse the same 4 vertices -> 0
-    glVertexAttribDivisor(1, 1); // positions : one per quad (its center) -> 1
-    glVertexAttribDivisor(2, 1); // color : one per quad -> 1
-
-    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 3, ParticlesCount);
-
 
     //Whilst window opened
     while(!glfwWindowShouldClose(window))
     {
         //WINDOW HANDLING:
         glClear(GL_COLOR_BUFFER_BIT);
-
-        glDrawArraysInstanced(GL_POINTS,0,3,ParticlesCount);//shape,start index,count of items.
-
-
-        //glBufferData(GL_ARRAY_BUFFER,6*sizeof(float),pos,GL_DYNAMIC_DRAW);
-
-        pos[0] =  rand();
-        pos[1] = rand();        
-        pos[2] = rand();            
-        pos[3] = rand();
-        pos[4] = rand();
-        pos[5] = rand();
+	
+	
+       	
+		
         
-        glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
-        glBufferData(GL_ARRAY_BUFFER,MaxParticles*4*sizeof(GLfloat),NULL,GL_STREAM_DRAW);
-        glBufferSubData(GL_ARRAY_BUFFER,0,ParticlesCount*sizeof(GLfloat)*4,pos);
        
-        glDrawArraysInstanced(GL_POINTS,0,3,ParticlesCount);
-        /*
-        glBindBuffer(GL_ARRAY_BUFFER,colBuffer);
-        glBufferData(GL_ARRAY_BUFFER,MaxParticles*4*sizeof(GLubyte),NULL,GL_STREAM_DRAW));
-        */
 
-        //glBufferData(GL_ARRAY_BUFFER,6*sizeof(float),NULL,GL_DYNAMIC_DRAW);
-        //glBufferSubData(GL_ARRAY_BUFFER,0,6*sizeof(float),pos);
+	//DATA UPDATE
+	pos =&{
+	    	(float)(rand()%100)/(float)100,
+		(float)(rand()%100)/(float)100,
+		(float)(rand()%100)/(float)100,
+		(float)(rand()%100)/(float)100,
+		(float)(rand()%100)/(float)100,
+		(float)(rand()%100)/(float)100,
+		(float)(rand()%100)/(float)100,
+		(float)(rand()%100)/(float)100 
 
+	}
+
+	/*a
+	
+	for (int i = 0; i<sizeof(pos)/sizeof(pos[0]);i++)	{
+		pos[i] = (float)(rand()%100)/(float)100;
+	}
+	*/
+
+	///WINDOW UPDATING
+    	glBufferData(GL_ARRAY_BUFFER,particleCount*dimensionCount*sizeof(float),NULL,GL_STREAM_DRAW);
+    	glBufferSubData(GL_ARRAY_BUFFER,0,particleCount*dimensionCount*sizeof(float),pos);
         
 
-        //WINDOW HANDLING: Front & back buffer swap
+    	//SEND DATA TO GPU i.e. update buffer (I THINK) 
+	glBindBuffer(GL_ARRAY_BUFFER, buffer); //Select a buffer and tell some info on the buffer
+	
+	//DRAW
+	glDrawArrays(GL_POINTS,0,particleCount);//shape,start index,count of items.
+	
+	
+	//WINDOW HANDLING: Front & back buffer swap
         glfwSwapBuffers(window);
+
+
+	//WINDOW HANDLING: RESIZE WINDOW
+	int width, height;
+
+	glfwGetWindowSize(window, &width,&height);
+
+	glViewport(0,0,width,height);
+
+
 
         //WINDOW HANDLING: Poll for and process any events
         glfwPollEvents();
+
 
     }
     glDeleteProgram(shader);
