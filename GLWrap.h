@@ -24,7 +24,8 @@ class GLWrap    {
             std::string VertexSource;
             std::string FragmentSource;
         };
-    
+        GLFWwindow* window;
+
      
         static ShaderSourceCode ParseShader(const std::string& filepath )   {
             /* Parse shader files */
@@ -99,20 +100,20 @@ class GLWrap    {
             }
         
         
-        GLFWwindow* setupWindow()    {
-            GLFWwindow* window;
+        int setupWindow()    {
+            //GLFWwindow* lwindow;
             if (!glfwInit())    {
                 std::cout<<"GLFW Error\n";
-                return NULL;
+                return -1;
             }
               
             //Create window & OpenGL context
-            window = glfwCreateWindow(640,480,"Hello World", NULL, NULL);
+            window = glfwCreateWindow(640,480,"WINDOW NAME", NULL, NULL);
            
             if (!window)    {
                 glfwTerminate();
                 std::cout<<"GLFW Error\n";
-                return NULL;
+                return -1;
             }
            
             //Make windows context current
@@ -120,23 +121,21 @@ class GLWrap    {
         
             if (glewInit() != GLEW_OK)  {
                 std::cout<<"GLEW Error\n";
-                return NULL;
+                return -1;
             }
-            return window;
+            //window= window;
+            return 0;
         }
-        MemberCallback positionUpdateFunction;
     //public:
-        typedef std::function<double*()> MemberCallback;
-        //double* (*positionUpdateFunction)();  //MOVE TO PRIVATE
         unsigned int buffer; //Address of buffer
-        GLFWwindow* window;
+        //GLFWwindow* window;
         
         GLWrap(unsigned int p_particleCount, unsigned int p_dimensionCount)  {
                        
             particleCount = p_particleCount;
             dimensionCount = p_dimensionCount;
 
-            window = setupWindow(); //Maybe should deal with -1 reutrns and stuff
+            setupWindow(); //Maybe should deal with -1 reutrns and stuff
         
             glGenBuffers(1,&buffer); //Gen single buffer with addr of buffer
             
@@ -151,7 +150,7 @@ class GLWrap    {
         
             glEnableVertexAttribArray(0);  //ENable below attrib
         
-            glVertexAttribPointer(0,2,GL_DOUBLE,GL_TRUE,sizeof(double)*dimensionCount,0); //Define the attrib
+            glVertexAttribPointer(0,2,GL_DOUBLE,GL_FALSE,sizeof(double)*dimensionCount,0); //Define the attrib
                 
             ShaderSourceCode source =ParseShader("shader.shader");
             
@@ -162,65 +161,66 @@ class GLWrap    {
             
         };
         
+                
+       // int setPositionUpdateFunction(std::function<double*()> updatePosFunPoint)    {
+       //     
+       //     positionUpdateFunction = updatePosFunPoint
+       //     return 0;
+       // }
+
+        int getExitAnimation() {
+        /*
+         *  Exit window check function
+         */
+            return glfwWindowShouldClose(window);
+        }
+
+        int exitWindow()    {
         
-        int setPositionUpdateFunction(double* (*updatePosFunPoint)())    {
-            /*
-             *  Function used to update positions at each frame draw in buffer form and hence 
-             *  also normalised
-             */
-            positionUpdateFunction = updatePosFunPoint;
+            glDeleteProgram(shader);
             return 0;
         }
-            
-        int simLoop()   {
-            while(!glfwWindowShouldClose(window))
-            {
-                //WINDOW HANDLING:
-                glClear(GL_COLOR_BUFFER_BIT);
-        	glBindBuffer(GL_ARRAY_BUFFER, buffer); //select a buffer and tell some info on the buffer
+        
+        int updateScreen(double* pointPos)   {
+            //WINDOW HANDLING:
+            glClear(GL_COLOR_BUFFER_BIT);
+            glBindBuffer(GL_ARRAY_BUFFER, buffer); //select a buffer and tell some info on the buffer
 
-        	//BUFFER UPDATUNG (SHOULD REALLY BE A LOOP FOR MULTIPLE UPDATES
-            	glBufferData(GL_ARRAY_BUFFER,
-                             particleCount*dimensionCount*sizeof(double),
-                             NULL,
-                             GL_STREAM_DRAW);
+            //BUFFER UPDATUNG (SHOULD REALLY BE A LOOP FOR MULTIPLE UPDATES
+            glBufferData(GL_ARRAY_BUFFER,
+                         particleCount*dimensionCount*sizeof(double),
+                         NULL,
+                         GL_STREAM_DRAW);
        
 
-                double * pos = positionUpdateFunction();
+            glBufferSubData(GL_ARRAY_BUFFER,
+                    0,
+                    particleCount*dimensionCount*sizeof(double),
+                    pointPos);
+            
+            
+            
+            //SEND DATA TO GPU i.e. update buffer (I THINK) 
+            glBindBuffer(GL_ARRAY_BUFFER, buffer); //select a buffer and tell some info on the buffer
 
+            //DRAW
+            //glDrawElements(GL_POINTS,particleCount,GL_UNSIGNED_INT,0);//shape,start index,count of items.
+            glDrawArrays(GL_POINTS,0,particleCount);//shape,start index,count of items.
+            
 
-                
-            	glBufferSubData(GL_ARRAY_BUFFER,
-                        0,
-                        particleCount*dimensionCount*sizeof(double),
-                        pos);
-                
-                
-            	//delete pos;
-                
-                //SEND DATA TO GPU i.e. update buffer (I THINK) 
-        	glBindBuffer(GL_ARRAY_BUFFER, buffer); //select a buffer and tell some info on the buffer
-
-        	//DRAW
-        	//glDrawArrays(GL_POINTS,0,particleCount);//shape,start index,count of items.
-        	glDrawArrays(GL_POINTS,0,particleCount);//shape,start index,count of items.
-
-        	//WINDOW HANDLING: Front & back buffer swap
-                glfwSwapBuffers(window);
+            //WINDOW HANDLING: Front & back buffer swap
+            glfwSwapBuffers(window);
         
-        	//WINDOW HANDLING: RESIZE WINDOW
-        	int width, height;
+            //WINDOW HANDLING: RESIZE WINDOW
+            int width, height;
         
-        	glfwGetWindowSize(window, &width,&height);
+            glfwGetWindowSize(window, &width,&height);
         
-        	glViewport(0,0,width,height);
+            glViewport(0,0,width,height);
         
-                //WINDOW HANDLING: Poll for and process any events
-                glfwPollEvents();
-                
+            //WINDOW HANDLING: Poll for and process any events
+            glfwPollEvents();
         
-            }
-            glDeleteProgram(shader);
         
             return 0;
         }
