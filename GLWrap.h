@@ -137,6 +137,9 @@ class GLWrap    {
 
             setupWindow(); //Maybe should deal with -1 reutrns and stuff
         
+            glfwSwapInterval(1); //NUMBER OF VSYNCS TO DO 
+            
+            
             glGenBuffers(1,&buffer); //Gen single buffer with addr of buffer
             
             glBindBuffer(GL_ARRAY_BUFFER, buffer); //Select a buffer and tell some info on the buffer
@@ -210,7 +213,6 @@ class GLWrap    {
 
             //WINDOW HANDLING: Front & back buffer swap
             glfwSwapBuffers(window);
-        
             //WINDOW HANDLING: RESIZE WINDOW
             int width, height;
         
