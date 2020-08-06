@@ -15,6 +15,7 @@ class testSim   {
             double y;
         };
         position * posL;
+        position * prevPosL;
         float dt = 0.05 ;
     
         unsigned int particleCount;
@@ -52,19 +53,38 @@ class testSim   {
     
     public:
         const unsigned int dimensionality = 2;
-        double * getPosBuffer() {
+        double * getBuffer() {
             position * posLNorm = normalisePosArr();//GEt normalised points in allowed form [-1,1]
-            double * retBuffer = new double[particleCount*dimensionality];//Buffer to return and send to gpu
+            double * retBuffer = new double[particleCount*dimensionality+dimensionality*dimensionality*2];//Buffer to return and send to gpu
            
             //Must flatten 2d array 
-            unsigned int c = 0;//Track position in new array/buffer where to place next 
+            retBuffer[0] = 0;
+            retBuffer[1] = 0;
+
+            retBuffer[2] = 0;
+            retBuffer[3] = 1;
+
+
+            retBuffer[4] = 0;
+            retBuffer[5] = 0;
+            
+            retBuffer[6] = 1;
+            retBuffer[7] = 0;
+
+            std::cout<<retBuffer[0]<<std::endl;
+            std::cout<<retBuffer[1]<<std::endl;
+            std::cout<<retBuffer[2]<<std::endl;
+            std::cout<<retBuffer[3]<<std::endl;
+            unsigned int c = 8;//Track position in new array/buffer where to place next 
             for (int i = 0; i < particleCount ; i++) {
                 retBuffer[c] = posLNorm[i].x;
+                std::cout<<retBuffer[c]<<std::endl;
                 c++;
                 retBuffer[c] = posLNorm[i].y;
+                std::cout<<retBuffer[c]<<std::endl;
                 c++;
         }
-        //std::cout<<"END RETURN BUFFER"<<std::endl;
+        
         return retBuffer;
         }
 
@@ -113,17 +133,34 @@ class testSim   {
             return dir;
         }
 
+        position randAdjust(unsigned i)   {
+            position dir;
+            dir.x = (posL[i].x - prevPosL[i].x)+(rand()-RAND_MAX/2)%RAND_MAX/(double)RAND_MAX;
+            dir.y = (posL[i].y - prevPosL[i].y)+(rand()-RAND_MAX/2)%RAND_MAX/(double)RAND_MAX;
+            double mag = sqrt(pow(dir.x,2)+pow(dir.y,2));
+            dir.x = dir.x/mag;
+            dir.y = dir.y/mag;
+            return dir;
+        }
         
+
         void timeStep() {//Position updater function
             std::cout<<"Timestep\n";
             for (int i= 0; i<particleCount/*sizeof(*posL)/sizeof(*position)*/;i++)    {
+               
+                //Update the previous position 
+                prevPosL[i].x = posL[i].x;
+                prevPosL[i].y = posL[i].y;
+                
+
                 unsigned int nnIndex = findNearestNeighbour(i);
                 position dir;
                 //= moveAwayDir(posL[i].x,posL[i].y,posL[nnIndex].x,posL[nnIndex].y);
                 if(distBetween(posL[i],posL[nnIndex])<100)    {
                     dir = moveAwayDir(posL[i],posL[nnIndex]);
                 }else   { 
-                    dir = randWalk(); 
+                    //dir = randWalk(); 
+                    dir = randAdjust(i);
                 }
 
                 
@@ -133,9 +170,9 @@ class testSim   {
                 
                  
 
-                std::cout<<"P:"<<i<<std::endl;
-                std::cout<<"dr:"<<dir.x<<","<<dir.y<<std::endl; 
-                std::cout<<"Positions:"<<posL[i].x<<","<<posL[i].y<<std::endl;
+                //std::cout<<"P:"<<i<<std::endl;
+                //std::cout<<"dr:"<<dir.x<<","<<dir.y<<std::endl; 
+                //std::cout<<"Positions:"<<posL[i].x<<","<<posL[i].y<<std::endl;
                 
             }
          
@@ -144,7 +181,7 @@ class testSim   {
 
         double * updatePositions()  {
             timeStep();
-            return getPosBuffer();
+            return getBuffer();
         }
 
 
@@ -153,9 +190,13 @@ class testSim   {
             dt = pdt;
             particleCount = pparticleCount;
             posL = new position[pparticleCount];
+            prevPosL = new position[pparticleCount];
             for (int i= 0; i< pparticleCount ;i++)    {
                 posL[i].x = (rand()-RAND_MAX/2)%k;
                 posL[i].y = (rand()-RAND_MAX/2)%k;
+                prevPosL[i].x = 0;
+                prevPosL[i].y = 0;
+
                 std::cout<<"START\n"<<i<<":"<<posL[i].x<<","<<posL[i].y<<std::endl;
             }
         }

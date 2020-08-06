@@ -128,49 +128,66 @@ class GLWrap    {
         }
     //public:
         unsigned int buffer; //Address of buffer
+        unsigned int axesBuffer;
         //GLFWwindow* window;
         
         GLWrap(unsigned int p_particleCount, unsigned int p_dimensionCount)  {
                        
             particleCount = p_particleCount;
             dimensionCount = p_dimensionCount;
-
             setupWindow(); //Maybe should deal with -1 reutrns and stuff
         
-            glfwSwapInterval(1); //NUMBER OF VSYNCS TO DO 
+            glfwSwapInterval(0); //NUMBER OF VSYNCS TO DO 
+            setupBuffer(particleCount,dimensionCount);
+            //setupParticles(particleCount,dimensionCount);
+            //setupAxes();
+            ShaderSourceCode source =ParseShader("shader.shader");
+             
+            shader = CreateShader(source.VertexSource, source.FragmentSource);
+            glUseProgram(shader);
+
+
+
+
             
+        };
+        void setupBuffer(unsigned int p_particleCount, unsigned int p_dimensionCount)  {
+ 
             
             glGenBuffers(1,&buffer); //Gen single buffer with addr of buffer
             
+            
+
             glBindBuffer(GL_ARRAY_BUFFER, buffer); //Select a buffer and tell some info on the buffer
             
             //Spec data of buffer
-            glBufferData(GL_ARRAY_BUFFER,particleCount*dimensionCount*sizeof(double),NULL,GL_STREAM_DRAW);
-            /*Define the buffer size, items and type of accesses for the buffer e.g. static where data mod
-             * once, accessed many and draw implying usage as drawing 'instruction'
+            glBufferData(GL_ARRAY_BUFFER,
+                         (dimensionCount)*(dimensionCount)*sizeof(double)
+                             +particleCount*dimensionCount*sizeof(double),
+                         NULL,
+                         GL_STREAM_DRAW);
+
+            /*Define the buffer size, items and type of accesses for the buffer e.g. static where 
+             * data mod once, accessed many and draw implying usage as drawing 'instruction'
              */
+
             //glBufferSubData(GL_ARRAY_BUFFER,0,particleCount*dimensionCount*sizeof(float),pos);
         
             glEnableVertexAttribArray(0);  //ENable below attrib
         
-            glVertexAttribPointer(0,2,GL_DOUBLE,GL_FALSE,sizeof(double)*dimensionCount,0); //Define the attrib
-                
-            ShaderSourceCode source =ParseShader("shader.shader");
             
-            shader = CreateShader(source.VertexSource, source.FragmentSource);
-            glUseProgram(shader);
+            glVertexAttribPointer(0,2,GL_DOUBLE,GL_FALSE,sizeof(double)*dimensionCount,0); 
+            //Define the attrib (2D positions)
+    
+            //glEnableVertexAttribArray(1);
+
             glBindBuffer(GL_ARRAY_BUFFER,0);  
-
             
-        };
-        
-                
-       // int setPositionUpdateFunction(std::function<double*()> updatePosFunPoint)    {
-       //     
-       //     positionUpdateFunction = updatePosFunPoint
-       //     return 0;
-       // }
+        }
 
+
+        
+        
         int getExitAnimation() {
         /*
          *  Exit window check function
@@ -183,33 +200,43 @@ class GLWrap    {
             glDeleteProgram(shader);
             return 0;
         }
-        
-        int updateScreen(double* pointPos)   {
-            //WINDOW HANDLING:
-            glClear(GL_COLOR_BUFFER_BIT);
-            glBindBuffer(GL_ARRAY_BUFFER, buffer); //select a buffer and tell some info on the buffer
 
-            //BUFFER UPDATUNG (SHOULD REALLY BE A LOOP FOR MULTIPLE UPDATES
+        void draw(double* dataBuffer)   {
+            //points BUFFER UPDATUNG (SHOULD REALLY BE A LOOP FOR MULTIPLE UPDATES
             glBufferData(GL_ARRAY_BUFFER,
-                         particleCount*dimensionCount*sizeof(double),
+                         (dimensionCount)*(dimensionCount)*sizeof(double)
+                             +particleCount*dimensionCount*sizeof(double),
                          NULL,
                          GL_STREAM_DRAW);
        
 
             glBufferSubData(GL_ARRAY_BUFFER,
                     0,
-                    particleCount*dimensionCount*sizeof(double),
-                    pointPos);
-            
-            
-            
-            //SEND DATA TO GPU i.e. update buffer (I THINK) 
-            glBindBuffer(GL_ARRAY_BUFFER, buffer); //select a buffer and tell some info on the buffer
+                    (dimensionCount)*(dimensionCount)*sizeof(double)
+                             +particleCount*dimensionCount*sizeof(double),
 
-            //DRAW
-            //glDrawElements(GL_POINTS,particleCount,GL_UNSIGNED_INT,0);//shape,start index,count of items.
-            glDrawArrays(GL_POINTS,0,particleCount);//shape,start index,count of items.
+                    dataBuffer);
             
+            
+            
+            //SEND points buffer DATA TO GPU i.e. update buffer (I THINK) 
+            glBindBuffer(GL_ARRAY_BUFFER, buffer); //select a buffer and tell some info on the buffer
+            //DRAW
+            //shape,start index,count of items.
+            //std::cout<<retBuffer[c];
+            glDrawArrays(GL_LINES,0,4);//dimensionCount);        !!!!?????Need sizeof ?????
+            glDrawArrays(GL_POINTS,dimensionCount*dimensionCount,particleCount);
+ 
+        }
+
+
+
+   
+
+        
+        int updateScreen()  {//double* pointPos)   {
+            //WINDOW HANDLING:
+             
 
             //WINDOW HANDLING: Front & back buffer swap
             glfwSwapBuffers(window);
@@ -222,9 +249,14 @@ class GLWrap    {
         
             //WINDOW HANDLING: Poll for and process any events
             glfwPollEvents();
-        
+            //std::cin.get(); 
         
             return 0;
         }
         
+    void screenClear()  {    
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
+        
+
 };
