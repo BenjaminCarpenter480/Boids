@@ -71,10 +71,6 @@ class testSim   {
             retBuffer[6] = 1;
             retBuffer[7] = 0;
 
-            std::cout<<retBuffer[0]<<std::endl;
-            std::cout<<retBuffer[1]<<std::endl;
-            std::cout<<retBuffer[2]<<std::endl;
-            std::cout<<retBuffer[3]<<std::endl;
             unsigned int c = 8;//Track position in new array/buffer where to place next 
             for (int i = 0; i < particleCount ; i++) {
                 retBuffer[c] = posLNorm[i].x;
