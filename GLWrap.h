@@ -225,7 +225,10 @@ class GLWrap    {
             //shape,start index,count of items.
             //std::cout<<retBuffer[c];
             glDrawArrays(GL_LINES,0,4);//dimensionCount);        !!!!?????Need sizeof ?????
-            glDrawArrays(GL_POINTS,dimensionCount*dimensionCount,particleCount);
+            
+            //std::cout<<"------------\n"<<dataBuffer[4]<<"-------------\n";
+            //std::cin.get();
+            glDrawArrays(GL_TRIANGLES,4,particleCount);
  
         }
 

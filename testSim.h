@@ -22,7 +22,38 @@ class testSim   {
         float dt = 0.05 ;
     
         unsigned int particleCount;
-        
+        position* normaliseArr(position* arr,int size) {
+            /*
+             * Normalisation function used by opengl to display points
+             */
+            double maxDistX = arr[0].x;
+            double maxDistY = arr[0].y; 
+            for (int i = 1; i < size ; i++) {
+                 if (maxDistX < arr[i].x)  {
+                    maxDistX =  arr[i].x;   
+                 }
+                 if (maxDistY < arr[i].y)   {
+                     maxDistY = arr[i].y;
+                }
+            }
+             
+            position* arrRet = new position[size];
+           
+            if(maxDistX>maxDistY)   {
+                for (int i = 0; i < particleCount ; i++) {
+                    arrRet[i].x = arr[i].x/maxDistX;
+                    arrRet[i].y = arr[i].y/maxDistX;
+                }
+            }else    {
+                for (int i = 0; i < particleCount ; i++) {
+                    arrRet[i].x = arr[i].x/maxDistY;
+                    arrRet[i].y = arr[i].y/maxDistY;
+                }
+            }
+            
+            return arrRet;
+        }
+
         position* normalisePosArr() {
             /*
              * Normalisation function used by opengl to display points
@@ -54,13 +85,31 @@ class testSim   {
             
             return posLRet;
         }
+
+
+        double updateMax1DMag(position test_pos, double max_mag)  {
+            if(test_pos.x>max_mag)    {
+                max_mag = test_pos.x;
+                
+            }else if(test_pos.y>max_mag)   {
+                max_mag = test_pos.y ;
+            }
+            return max_mag;     
+                
+        }
+
+        
+
+
+
+
     
     public:
         const unsigned int dimensionality = 2;
         double * getBuffer() {
             //SETUP BUFFER AND NORMALISED POSITIONS
             position * posLNorm = normalisePosArr();//GEt normalised points in allowed form [-1,1]
-            double * retBuffer = new double[particleCount*dimensionality+dimensionality*dimensionality*2];//Buffer to return and send to gpu
+            double * retBuffer = new double[particleCount*dimensionality*3+dimensionality*dimensionality*2];//Buffer to return and send to gpu
             position * flatTriag = new position[particleCount*3];
 
             //AXES LINES POSTIONS
@@ -78,43 +127,86 @@ class testSim   {
             retBuffer[7] = 0;
 
             //Setup arrow coords
-            
-            unsigned int c = 8;//Track position in new array/buffer where to place next 
+            double max_1d_mag=0; 
+            unsigned int j = 0;//Track position in new array/buffer where to place next 
             for (int i = 0; i < particleCount ; i++) {
-                flatTriag[c].x = posLNorm[i].x + radius*dir.x;
-                flatTriag[c].y = posLNorm[i].y + radius*dir.y;
+                flatTriag[j].x = posL[i].x + radius*dir[i].x;
+                flatTriag[j].y = posL[i].y + radius*dir[i].y;
+                max_1d_mag =  updateMax1DMag(flatTriag[j],max_1d_mag);
                 
+                //std::cout<<flatTriag[j].x<<","<<flatTriag[j].y<<std::endl;
+                j++;
+                position dir_t ;
+                dir_t.x = 1;
+                dir_t.y =  -1*dir[i].x/dir[i].y;
 
+                double mag = pow(pow(dir_t.x,2)+pow(dir_t.y,2),1/2);
+                flatTriag[j].x = posL[i].x + (dir_t.x/mag)*radius/2;
+                flatTriag[j].y = posL[i].y + (dir_t.y/mag)*radius/2;
+                max_1d_mag =  updateMax1DMag(flatTriag[j],max_1d_mag);
 
+                //std::cout<<flatTriag[j].x<<","<<flatTriag[j].y<<std::endl;
+                j++;
+                flatTriag[j].x = posL[i].x + dir_t.x/mag*-1;
+                flatTriag[j].y = posL[i].y + dir_t.y/mag*-1;
+                max_1d_mag =  updateMax1DMag(flatTriag[j],max_1d_mag);
 
+                std::cout<<i<<":    "<<flatTriag[j-2].x<<","<<flatTriag[j-2].y<<","<<flatTriag[j-1].x<<","<<flatTriag[j-1].y<<","<<flatTriag[j].x<<","<<flatTriag[j].y<<std::endl;
+                j++;
+                
+                //std::cin.get();    
+            }
+
+            std::cout << "-------------"<<max_1d_mag<<"---------------\n";
+            // flatTriag = normaliseArr(flatTriag,particleCount*3);
+            //max_1d_mag = 10000;
             //Must flatten 2d array of positions
-            c = 8;//Track position in new array/buffer where to place next 
-            for (int i = 0; i < particleCount ; i++) {
-                retBuffer[c] = posLNorm[i].x;
-                std::cout<<retBuffer[c]<<std::endl;
+            //MUST BE NORMALISED SOMWHERE BELOW
+            unsigned int c = 8;//Track position in new array/buffer where to place next 
+            for (int i = 0; i < particleCount*3 ; i++) {
+                retBuffer[c] = flatTriag[i].x/max_1d_mag;
+               // std::cout<<retBuffer[c]<<",";
                 c++;
-                retBuffer[c] = posLNorm[i].y;
-                std::cout<<retBuffer[c]<<std::endl;
+                retBuffer[c] = flatTriag[i].y/max_1d_mag;
+               // std::cout<<retBuffer[c]<<std::endl;
                 c++;
-        }
+            }
         
         return retBuffer;
         }
 
-        unsigned int findNearestNeighbour(unsigned int index)    {
+        unsigned int findFurthestNeighbour(unsigned int index)    {
             double maxDist = sqrt(pow(posL[0].x,2)+pow(posL[0].y,2)); 
             unsigned int nnIndex = 0;
             for (int i = 1; i < particleCount ; i++) {
-                double currentDist = sqrt(pow(posL[i].x,2)+pow(posL[i].y,2))  ; 
-                if (maxDist< currentDist)  {
-                    maxDist = currentDist;
-                    nnIndex = i;
+                if (index != i) {
+                    double currentDist = sqrt(pow(posL[i].x,2)+pow(posL[i].y,2))  ; 
+                    if (maxDist < currentDist)  {
+                        maxDist = currentDist;
+                        nnIndex = i;
+                    }
                 }
             }
             return nnIndex;
         }
 
-        position moveAwayDir(unsigned int xS, unsigned int yS,unsigned int xT, unsigned int yT)    {
+
+        unsigned int findNearestNeighbour(unsigned int index)    {
+            double minDist = 1e32; //sqrt(pow(posL[0].x,2)+pow(posL[0].y,2)); 
+            unsigned int nnIndex = 0;
+            for (int i = 0; i < particleCount ; i++) {
+                if (index != i) {
+                    double currentDist = sqrt(pow(posL[i].x-posL[index].x,2)+pow(posL[i].y-posL[index].y,2))  ; 
+                    if (minDist > currentDist)  {
+                        minDist = currentDist;
+                        nnIndex = i;
+                    }
+                }
+            }
+            return nnIndex;
+        }
+
+        position moveAwayDir(int xS, int yS, int xT, int yT)    {
         //MOVE PERPENDICULAR TO Nearest neighbour
             position retPos;
             position diffs;
@@ -180,7 +272,6 @@ class testSim   {
                 }
 
                 
-
                 posL[i].x = posL[i].x +dt*dir[i].x;
                 posL[i].y = posL[i].y +dt*dir[i].y;
                 
@@ -189,9 +280,9 @@ class testSim   {
                 //std::cout<<"P:"<<i<<std::endl;
                 //std::cout<<"dr:"<<dir.x<<","<<dir.y<<std::endl; 
                 //std::cout<<"Positions:"<<posL[i].x<<","<<posL[i].y<<std::endl;
-                
             }
          
+                
         }
 
 
@@ -215,7 +306,7 @@ class testSim   {
                 prevPosL[i].x = 0;
                 prevPosL[i].y = 0;
 
-                std::cout<<"START\n"<<i<<":"<<posL[i].x<<","<<posL[i].y<<std::endl;
+                //std::cout<<"START\n"<<i<<":"<<posL[i].x<<","<<posL[i].y<<std::endl;
             }
         }
         
