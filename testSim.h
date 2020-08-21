@@ -17,7 +17,7 @@ class testSim   {
         position * posL;
         position * prevPosL;
         position * dir;
-        const float radius = 100; 
+        const float radius = 1000; 
         
         float dt = 0.05 ;
     
@@ -130,34 +130,56 @@ class testSim   {
             double max_1d_mag=0; 
             unsigned int j = 0;//Track position in new array/buffer where to place next 
             for (int i = 0; i < particleCount ; i++) {
+                
+                //Calc Tip position
+                /*
                 flatTriag[j].x = posL[i].x + radius*dir[i].x;
                 flatTriag[j].y = posL[i].y + radius*dir[i].y;
+                */
+                flatTriag[j].x = posL[i].x+radius;
+                flatTriag[j].y = posL[i].y+radius; 
                 max_1d_mag =  updateMax1DMag(flatTriag[j],max_1d_mag);
                 
-                //std::cout<<flatTriag[j].x<<","<<flatTriag[j].y<<std::endl;
+                //Calc A Side Pos
                 j++;
                 position dir_t ;
-                dir_t.x = 1;
-                dir_t.y =  -1*dir[i].x/dir[i].y;
-
-                double mag = pow(pow(dir_t.x,2)+pow(dir_t.y,2),1/2);
-                flatTriag[j].x = posL[i].x + (dir_t.x/mag)*radius/2;
-                flatTriag[j].y = posL[i].y + (dir_t.y/mag)*radius/2;
+                //dir_t.x = 1;
+                //dir_t.y =  -1*dir[i].x/dir[i].y;
+                dir_t.x = radius;
+                dir_t.y = 0;
+                flatTriag[j].x = posL[i].x + dir_t.x;
+                flatTriag[j].y = posL[i].y + dir_t.y;
+                //double mag = pow(pow(dir_t.x,2)+pow(dir_t.y,2),1/2);
+                //flatTriag[j].x = posL[i].x + (dir_t.x/mag)*radius/2;
+                //flatTriag[j].y = posL[i].y + (dir_t.y/mag)*radius/2;
                 max_1d_mag =  updateMax1DMag(flatTriag[j],max_1d_mag);
 
                 //std::cout<<flatTriag[j].x<<","<<flatTriag[j].y<<std::endl;
+                
+                
+                
+                
+                //Calc B side pos
+                
                 j++;
-                flatTriag[j].x = posL[i].x + dir_t.x/mag*-1;
-                flatTriag[j].y = posL[i].y + dir_t.y/mag*-1;
+                dir_t.x = -1* radius;
+                dir_t.y = 0;
+                flatTriag[j].x = posL[i].x + dir_t.x;
+                flatTriag[j].y = posL[i].y + dir_t.y;
+
+
+
+                //flatTriag[j].x = posL[i].x + dir_t.x/mag*-1;
+                //flatTriag[j].y = posL[i].y + dir_t.y/mag*-1;
                 max_1d_mag =  updateMax1DMag(flatTriag[j],max_1d_mag);
 
-                std::cout<<i<<":    "<<flatTriag[j-2].x<<","<<flatTriag[j-2].y<<","<<flatTriag[j-1].x<<","<<flatTriag[j-1].y<<","<<flatTriag[j].x<<","<<flatTriag[j].y<<std::endl;
+                //std::cout<<i<<":    "<<flatTriag[j-2].x<<","<<flatTriag[j-2].y<<","<<flatTriag[j-1].x<<","<<flatTriag[j-1].y<<","<<flatTriag[j].x<<","<<flatTriag[j].y<<std::endl;
                 j++;
                 
                 //std::cin.get();    
             }
 
-            std::cout << "-------------"<<max_1d_mag<<"---------------\n";
+            
             // flatTriag = normaliseArr(flatTriag,particleCount*3);
             //max_1d_mag = 10000;
             //Must flatten 2d array of positions
@@ -165,10 +187,10 @@ class testSim   {
             unsigned int c = 8;//Track position in new array/buffer where to place next 
             for (int i = 0; i < particleCount*3 ; i++) {
                 retBuffer[c] = flatTriag[i].x/max_1d_mag;
-               // std::cout<<retBuffer[c]<<",";
+                std::cout<<retBuffer[c]<<",";
                 c++;
                 retBuffer[c] = flatTriag[i].y/max_1d_mag;
-               // std::cout<<retBuffer[c]<<std::endl;
+                std::cout<<retBuffer[c]<<std::endl;
                 c++;
             }
         

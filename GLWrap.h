@@ -162,8 +162,7 @@ class GLWrap    {
             
             //Spec data of buffer
             glBufferData(GL_ARRAY_BUFFER,
-                         (dimensionCount)*(dimensionCount)*sizeof(double)
-                             +particleCount*dimensionCount*sizeof(double),
+                         ((particleCount*dimensionCount*3+dimensionCount*dimensionCount*2)*sizeof(double)),
                          NULL,
                          GL_STREAM_DRAW);
 
@@ -203,17 +202,22 @@ class GLWrap    {
 
         void draw(double* dataBuffer)   {
             //points BUFFER UPDATUNG (SHOULD REALLY BE A LOOP FOR MULTIPLE UPDATES
+            unsigned int bufferSize =/*(dimensionCount)*(dimensionCount)*sizeof(double)
+                             +particleCount*dimensionCount*sizeof(double)*/
+                             ((particleCount*dimensionCount*3+dimensionCount*dimensionCount*2)*sizeof(double));
             glBufferData(GL_ARRAY_BUFFER,
-                         (dimensionCount)*(dimensionCount)*sizeof(double)
-                             +particleCount*dimensionCount*sizeof(double),
+                         bufferSize,
                          NULL,
                          GL_STREAM_DRAW);
-       
+
+            //for(int i = 0 ; i<(particleCount*dimensionCount*3+dimensionCount*dimensionCount*2);i=i+2)  {   
+                //std::cout<<dataBuffer[i]<<","<< dataBuffer[i+1]<<std::endl;
+                
+            //}
 
             glBufferSubData(GL_ARRAY_BUFFER,
                     0,
-                    (dimensionCount)*(dimensionCount)*sizeof(double)
-                             +particleCount*dimensionCount*sizeof(double),
+                    bufferSize,
 
                     dataBuffer);
             
@@ -228,7 +232,9 @@ class GLWrap    {
             
             //std::cout<<"------------\n"<<dataBuffer[4]<<"-------------\n";
             //std::cin.get();
-            glDrawArrays(GL_TRIANGLES,4,particleCount);
+            glDrawArrays(GL_TRIANGLES,4,particleCount*3);
+    
+            
  
         }
 
