@@ -1,23 +1,28 @@
 /*
  *
- * TODO: 
- * Off edge of screen issues
+ * TODO:
+ * Convert std::out comments into debug messages of some sort?? 
+ * Clean up code to make parameter change easier (property file)
+ * Off edge of screen issues, fix with border?
  * Move away dir causes issues (Not normalised??)
+ * Change colour depending on distance to others?
+ * Combine behaviours together
+ * FPS vs Particle number (vs speed etc) constant calculation
  */
 
 
 #include <cmath>
 #include <chrono>
 #include <thread>
-class testSim   {
+class Boids   {
     private:
-        struct position {
+        struct vector {
             double x;
             double y;
         };
-        position * posL;
-        position * prevPosL;
-        position * dir;
+        vector * posL;
+        vector * prevPosL;
+        vector * dir;
         const float radius_d = 400; 
         const double angle_d =M_PI*2/3;
         const double MOVE_APART_DIST = 250;
@@ -25,7 +30,7 @@ class testSim   {
         float dt = 0.05 ;
     
         unsigned int particleCount;
-        position* normaliseArr(position* arr,int size) {
+        vector* normaliseArr(vector* arr,int size) {
             /*
              * Normalisation function used by opengl to display points
              */
@@ -40,7 +45,7 @@ class testSim   {
                 }
             }
              
-            position* arrRet = new position[size];
+            vector* arrRet = new vector[size];
            
             if(maxDistX>maxDistY)   {
                 for (int i = 0; i < particleCount ; i++) {
@@ -57,7 +62,7 @@ class testSim   {
             return arrRet;
         }
 
-        position* normalisePosArr() {
+        vector* normalisePosArr() {
             /*
              * Normalisation function used by opengl to display points
              */
@@ -72,7 +77,7 @@ class testSim   {
                 }
             }
              
-            position* posLRet = new position[particleCount];
+            vector* posLRet = new vector[particleCount];
            
             if(maxDistX>maxDistY)   {
                 for (int i = 0; i < particleCount ; i++) {
@@ -90,7 +95,7 @@ class testSim   {
         }
 
 
-        double updateMax1DMag(position test_pos, double max_mag)  {
+        double updateMax1DMag(vector test_pos, double max_mag)  {
             if(test_pos.x>max_mag)    {
                 max_mag = test_pos.x;
                 
@@ -105,9 +110,9 @@ class testSim   {
         const unsigned int dimensionality = 2;
         double * getBuffer() {
             //SETUP BUFFER AND NORMALISED POSITIONS
-            position * posLNorm = normalisePosArr();//GEt normalised points in allowed form [-1,1]
+            vector * posLNorm = normalisePosArr();//GEt normalised points in allowed form [-1,1]
             double * retBuffer = new double[particleCount*dimensionality*3+dimensionality*dimensionality*2];//Buffer to return and send to gpu
-            position * flatTriag = new position[particleCount*3];
+            vector * flatTriag = new vector[particleCount*3];
 
             //AXES LINES POSTIONS
             retBuffer[0] = 0;
@@ -205,10 +210,10 @@ class testSim   {
             return nnIndex;
         }
 
-        position moveAwayDir(int xS, int yS, int xT, int yT)    {
+        vector moveAwayDir(int xS, int yS, int xT, int yT)    {
         //MOVE PERPENDICULAR TO Nearest neighbour
-            position retPos;
-            position diffs;
+            vector retPos;
+            vector diffs;
             diffs.x = xT-xS;
             diffs.y = yT-yS;
             double mag = sqrt(pow(diffs.x,2)+pow(diffs.y,2));
@@ -222,18 +227,21 @@ class testSim   {
         }
 
 
-        position moveAwayDir(position self, position posAwayFrom)  {
+        vector moveAwayDir(vector self, vector posAwayFrom)  {
             return moveAwayDir(self.x,self.y,posAwayFrom.x,posAwayFrom.y);
         }
+        
+
+        //vector moveCopyDir(vector
 
 
-        double distBetween(position A, position B)  {
+        double distBetween(vector A, vector B)  {
             return sqrt(pow(A.x-B.x,2)+pow(A.y-B.y,2));
         }
         
 
-        position randWalk() {
-            position dir_t; 
+        vector randWalk() {
+            vector dir_t; 
             dir_t.x= ((rand()-RAND_MAX/2)%RAND_MAX/(double)RAND_MAX);
              
             dir_t.y= ((rand()-RAND_MAX/2)%RAND_MAX/(double)RAND_MAX);
@@ -241,9 +249,9 @@ class testSim   {
             return dir_t;
         }
 
-        position randAdjust(unsigned i)   {
+        vector randAdjust(unsigned i)   {
             //Makes a slight adjustment to the direction travelled rather than totally changing position
-            position dir_t;
+            vector dir_t;
             dir_t.x = (posL[i].x - prevPosL[i].x)+(rand()-RAND_MAX/2)%RAND_MAX/(double)RAND_MAX*0.005;
             dir_t.y = (posL[i].y - prevPosL[i].y)+(rand()-RAND_MAX/2)%RAND_MAX/(double)RAND_MAX*0.005;
             double mag = sqrt(pow(dir_t.x,2)+pow(dir_t.y,2));
@@ -255,7 +263,7 @@ class testSim   {
 
         void timeStep() {//Position updater function
             std::cout<<"Timestep\n";
-            for (int i= 0; i<particleCount/*sizeof(*posL)/sizeof(*position)*/;i++)    {
+            for (int i= 0; i<particleCount/*sizeof(*posL)/sizeof(*vector)*/;i++)    {
                
                 //Update the previous position 
                 prevPosL[i].x = posL[i].x;
@@ -297,12 +305,12 @@ class testSim   {
 
 
 
-        testSim(unsigned int pparticleCount,double pdt,int k) {
+        Boids(unsigned int pparticleCount,double pdt,int k) {
             dt = pdt;
             particleCount = pparticleCount;
-            posL = new position[pparticleCount];
-            prevPosL = new position[pparticleCount];
-            dir = new position[pparticleCount];
+            posL = new vector[pparticleCount];
+            prevPosL = new vector[pparticleCount];
+            dir = new vector[pparticleCount];
             for (int i= 0; i< pparticleCount ;i++)    {
                 //Setup initial posiitons and dir_tections
                 posL[i].x = (rand()-RAND_MAX/2)%k;

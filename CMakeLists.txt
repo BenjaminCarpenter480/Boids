@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_BUILD_TYPE Debug)
 
-add_executable(HelloGL main.cpp GLWrap.h testSim.h shader.shader)
+add_executable(BoidsAnimation main.cpp GLWrap.h Boids.h shader.shader)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/shader.shader
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
@@ -21,25 +21,25 @@ add_subdirectory(glfw-3.3.2)
 include_directories(glfw-3.3.2/include)
 
 
-#target_link_libraries(HelloGL glfw ${GLFW_LIBRARIES})
+#target_link_libraries(BoidsAnimation glfw ${GLFW_LIBRARIES})
 
 
-target_link_libraries(HelloGL PRIVATE ${GLFW_LIBRARIES})
+target_link_libraries(BoidsAnimation PRIVATE ${GLFW_LIBRARIES})
 
-#target_link_libraries(HelloGL glfw ${OPENGL_glu_LIBRARY} ${GLFW_LIBRARIES})
+#target_link_libraries(BoidsAnimation glfw ${OPENGL_glu_LIBRARY} ${GLFW_LIBRARIES})
 
 
 find_package(OpenGL REQUIRED)
 
-target_link_libraries(HelloGL OpenGL::GL)
+target_link_libraries(BoidsAnimation OpenGL::GL)
 
 add_subdirectory( ${PROJECT_SOURCE_DIR}/glew-2.1.0/build/cmake )
 
-target_include_directories(HelloGL PRIVATE
+target_include_directories(BoidsAnimation PRIVATE
     ${PROJECT_SOURCE_DIR}/glew-2.1.0/include
 )
 
-target_link_libraries(HelloGL glew glfw )
+target_link_libraries(BoidsAnimation glew glfw )
 
 
 set(ENV(MESA_GL_VERSION_OVERRIDE "3.3"))

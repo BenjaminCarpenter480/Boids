@@ -56,6 +56,17 @@ CMAKE_BINARY_DIR = /home/benjamin/Desktop/OpenGL/build-dir
 #=============================================================================
 # Targets provided globally by CMake.
 
+# Special rule for the target edit_cache
+edit_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
+	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+.PHONY : edit_cache
+
+# Special rule for the target edit_cache
+edit_cache/fast: edit_cache
+
+.PHONY : edit_cache/fast
+
 # Special rule for the target install/strip
 install/strip: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
@@ -67,17 +78,6 @@ install/strip/fast: preinstall/fast
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
 	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip/fast
-
-# Special rule for the target edit_cache
-edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
-.PHONY : edit_cache
-
-# Special rule for the target edit_cache
-edit_cache/fast: edit_cache
-
-.PHONY : edit_cache/fast
 
 # Special rule for the target rebuild_cache
 rebuild_cache:
@@ -157,17 +157,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named HelloGL
+# Target rules for targets named BoidsAnimation
 
 # Build rule for target.
-HelloGL: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 HelloGL
-.PHONY : HelloGL
+BoidsAnimation: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 BoidsAnimation
+.PHONY : BoidsAnimation
 
 # fast build rule for target.
-HelloGL/fast:
-	$(MAKE) -f CMakeFiles/HelloGL.dir/build.make CMakeFiles/HelloGL.dir/build
-.PHONY : HelloGL/fast
+BoidsAnimation/fast:
+	$(MAKE) -f CMakeFiles/BoidsAnimation.dir/build.make CMakeFiles/BoidsAnimation.dir/build
+.PHONY : BoidsAnimation/fast
 
 #=============================================================================
 # Target rules for targets named uninstall
@@ -253,7 +253,7 @@ main.o: main.cpp.o
 
 # target to build an object file
 main.cpp.o:
-	$(MAKE) -f CMakeFiles/HelloGL.dir/build.make CMakeFiles/HelloGL.dir/main.cpp.o
+	$(MAKE) -f CMakeFiles/BoidsAnimation.dir/build.make CMakeFiles/BoidsAnimation.dir/main.cpp.o
 .PHONY : main.cpp.o
 
 main.i: main.cpp.i
@@ -262,7 +262,7 @@ main.i: main.cpp.i
 
 # target to preprocess a source file
 main.cpp.i:
-	$(MAKE) -f CMakeFiles/HelloGL.dir/build.make CMakeFiles/HelloGL.dir/main.cpp.i
+	$(MAKE) -f CMakeFiles/BoidsAnimation.dir/build.make CMakeFiles/BoidsAnimation.dir/main.cpp.i
 .PHONY : main.cpp.i
 
 main.s: main.cpp.s
@@ -271,7 +271,7 @@ main.s: main.cpp.s
 
 # target to generate assembly for a file
 main.cpp.s:
-	$(MAKE) -f CMakeFiles/HelloGL.dir/build.make CMakeFiles/HelloGL.dir/main.cpp.s
+	$(MAKE) -f CMakeFiles/BoidsAnimation.dir/build.make CMakeFiles/BoidsAnimation.dir/main.cpp.s
 .PHONY : main.cpp.s
 
 # Help Target
@@ -280,11 +280,11 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... install/strip"
 	@echo "... edit_cache"
+	@echo "... install/strip"
+	@echo "... BoidsAnimation"
 	@echo "... rebuild_cache"
 	@echo "... list_install_components"
-	@echo "... HelloGL"
 	@echo "... install/local"
 	@echo "... install"
 	@echo "... uninstall"

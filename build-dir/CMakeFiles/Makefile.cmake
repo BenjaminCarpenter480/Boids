@@ -67,7 +67,7 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/HelloGL.dir/DependInfo.cmake"
+  "CMakeFiles/BoidsAnimation.dir/DependInfo.cmake"
   "glfw-3.3.2/CMakeFiles/uninstall.dir/DependInfo.cmake"
   "glfw-3.3.2/src/CMakeFiles/glfw.dir/DependInfo.cmake"
   "glew-2.1.0/build/cmake/CMakeFiles/glew.dir/DependInfo.cmake"

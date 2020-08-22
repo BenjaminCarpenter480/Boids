@@ -1,3 +1,7 @@
+/*
+* Handelling of major graphics functions using openGL (Refactor for more functions into here may be useful)
+*/
+
 #include <iostream>
 
 
