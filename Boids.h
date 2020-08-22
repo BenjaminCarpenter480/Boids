@@ -2,6 +2,7 @@
  *
  * TODO:
  * Convert std::out comments into debug messages of some sort?? 
+ * Use View to move in direction of boid ahead rather than nearest?
  * Clean up code to make parameter change easier (property file)
  * Off edge of screen issues, fix with border?
  * Move away dir causes issues (Not normalised??)
@@ -12,6 +13,7 @@
 
 
 #include <cmath>
+#include <iostream> 
 #include <chrono>
 #include <thread>
 class Boids   {
@@ -26,7 +28,7 @@ class Boids   {
         const float radius_d = 400; 
         const double angle_d =M_PI*2/3;
         const double MOVE_APART_DIST = 250;
-        const double COPY_MOVE_DIST = 500;
+        const double COPY_MOVE_DIST = 300;
         
         float dt = 0.05 ;
     
@@ -269,9 +271,10 @@ class Boids   {
         
 
         void timeStep() {//Position updater function
+            std::cout<<"Timestep"<<std::endl;
             //std::cout<<"Timestep\n";
             for (int i= 0; i<particleCount/*sizeof(*posL)/sizeof(*vector)*/;i++)    {
-               
+                
                 //Update the previous position 
                 
                 prevPosL[i].x = posL[i].x;
@@ -280,10 +283,29 @@ class Boids   {
 
                 unsigned int nnIndex = findNearestNeighbour(i);
                 double distToNN = distBetween(posL[i],posL[nnIndex]);
-                 if(distToNN<MOVE_APART_DIST)    {
+                
+                if(distToNN<MOVE_APART_DIST)    {
                     dir[i] = moveAwayDir(posL[i],posL[nnIndex]);
-                }else   { 
-                    //dir_t = randWalk(); 
+                }
+
+                if (distToNN<COPY_MOVE_DIST &&((double)rand()/RAND_MAX)<0.005)    {
+                   dir[i] = moveCopyDir(nnIndex);
+                }
+
+                if(((double)rand()/RAND_MAX)<0.99) {
+                    dir[i] = randAdjust(i);
+                }
+                
+
+               
+                if(distToNN<MOVE_APART_DIST)    {
+                    dir[i] = moveAwayDir(posL[i],posL[nnIndex]);
+                }
+                else if (distToNN<COPY_MOVE_DIST)    {
+                   dir[i] = moveCopyDir(nnIndex);
+                }
+                else   { 
+
                     
                     if(((double)rand()/RAND_MAX)<0.25) {
                         dir[i] = randAdjust(i);
@@ -300,7 +322,6 @@ class Boids   {
                 //std::cout<<"dr:"<<dir.x<<","<<dir.y<<std::endl; 
                 //std::cout<<"Positions:"<<posL[i].x<<","<<posL[i].y<<std::endl;
             }
-            std::cout<<"\n";
          
                 
         }

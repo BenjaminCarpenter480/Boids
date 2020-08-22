@@ -69,6 +69,8 @@ GL/glu.h
 /home/benjamin/Desktop/OpenGL/Boids.h
 cmath
 -
+iostream
+-
 chrono
 -
 thread
