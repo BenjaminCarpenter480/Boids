@@ -13,7 +13,7 @@
 
 
 int main()	{
-	const unsigned int particleCount= 15; //IS actually a few less than this
+	const unsigned int particleCount= 5; //IS actually a few less than this
 	const unsigned int dimensionCount=2;
 	const double dt_speed = 100;//Constant on the stepsize as movement is done on unit method
 	const int k=100;//Density effectively (higher k lower density)
@@ -29,17 +29,15 @@ int main()	{
 	    testSimObj.timeStep();
 	   
 	    //std::cout << testSimObj.getPosBuffer()<<std::endl;	    
-	    if (c%1==0)	{
 		test.screenClear();
 		test.draw(testSimObj.getBuffer());
 		test.updateScreen();
-	    }else{
-	    	testSimObj.getBuffer();
+	    usleep(40000);
 	    //std::cout<<"HERE\n";
 	    //sleep(0.95);
 	    //std::cin.get();
-	    }
-	c++;
+	    
+		c++;
 	//std::cout <<c<<std::endl;
 	}
 	test.exitWindow();

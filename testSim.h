@@ -1,7 +1,8 @@
 /*
  *
- * TODO: RENAME position struct to vector
- * UPDATE BASE MOVEMENT FROM RANDOM WALK TO ONLY A SLIGHT CHANGE FROM THE PREVIOUS DIRECTION 
+ * TODO: 
+ * Off edge of screen issues
+ * Move away dir causes issues (Not normalised??)
  */
 
 
@@ -17,7 +18,8 @@ class testSim   {
         position * posL;
         position * prevPosL;
         position * dir;
-        const float radius = 1000; 
+        const float radius_d = 400; 
+        const double angle_d =M_PI_2;
         
         float dt = 0.05 ;
     
@@ -97,12 +99,6 @@ class testSim   {
             return max_mag;     
                 
         }
-
-        
-
-
-
-
     
     public:
         const unsigned int dimensionality = 2;
@@ -132,65 +128,45 @@ class testSim   {
             for (int i = 0; i < particleCount ; i++) {
                 
                 //Calc Tip position
-                /*
-                flatTriag[j].x = posL[i].x + radius*dir[i].x;
-                flatTriag[j].y = posL[i].y + radius*dir[i].y;
-                */
-                flatTriag[j].x = posL[i].x+radius;
-                flatTriag[j].y = posL[i].y+radius; 
+                
+                flatTriag[j].x = posL[i].x + radius_d*dir[i].x;
+                flatTriag[j].y = posL[i].y + radius_d*dir[i].y; 
                 max_1d_mag =  updateMax1DMag(flatTriag[j],max_1d_mag);
                 
                 //Calc A Side Pos
                 j++;
-                position dir_t ;
-                //dir_t.x = 1;
-                //dir_t.y =  -1*dir[i].x/dir[i].y;
-                dir_t.x = radius;
-                dir_t.y = 0;
-                flatTriag[j].x = posL[i].x + dir_t.x;
-                flatTriag[j].y = posL[i].y + dir_t.y;
-                //double mag = pow(pow(dir_t.x,2)+pow(dir_t.y,2),1/2);
-                //flatTriag[j].x = posL[i].x + (dir_t.x/mag)*radius/2;
-                //flatTriag[j].y = posL[i].y + (dir_t.y/mag)*radius/2;
+                flatTriag[j].x = posL[i].x + radius_d*(dir[i].x*cos(angle_d)-dir[i].y*sin(angle_d));
+                flatTriag[j].y = posL[i].y + radius_d*(dir[i].y*cos(angle_d)+dir[i].x*sin(angle_d));
+
                 max_1d_mag =  updateMax1DMag(flatTriag[j],max_1d_mag);
 
-                //std::cout<<flatTriag[j].x<<","<<flatTriag[j].y<<std::endl;
-                
-                
-                
+              
                 
                 //Calc B side pos
                 
                 j++;
-                dir_t.x = -1* radius;
-                dir_t.y = 0;
-                flatTriag[j].x = posL[i].x + dir_t.x;
-                flatTriag[j].y = posL[i].y + dir_t.y;
-
-
-
-                //flatTriag[j].x = posL[i].x + dir_t.x/mag*-1;
-                //flatTriag[j].y = posL[i].y + dir_t.y/mag*-1;
+                flatTriag[j].x = posL[i].x + radius_d*(dir[i].x*cos(-1*angle_d)-dir[i].y*sin(-1*angle_d));
+                flatTriag[j].y = posL[i].y + radius_d*(dir[i].y*cos(-1*angle_d)+dir[i].x*sin(-1*angle_d));
                 max_1d_mag =  updateMax1DMag(flatTriag[j],max_1d_mag);
 
-                //std::cout<<i<<":    "<<flatTriag[j-2].x<<","<<flatTriag[j-2].y<<","<<flatTriag[j-1].x<<","<<flatTriag[j-1].y<<","<<flatTriag[j].x<<","<<flatTriag[j].y<<std::endl;
+                //std::cout<<i<<":\n    ("<<flatTriag[j-2].x<<","<<flatTriag[j-2].y<<")\n("<<flatTriag[j-1].x<<","<<flatTriag[j-1].y<<")\n("<<flatTriag[j].x<<","<<flatTriag[j].y<<")\n";
                 j++;
                 
-                //std::cin.get();    
+               
             }
 
             
-            // flatTriag = normaliseArr(flatTriag,particleCount*3);
-            //max_1d_mag = 10000;
+            
+            
             //Must flatten 2d array of positions
             //MUST BE NORMALISED SOMWHERE BELOW
             unsigned int c = 8;//Track position in new array/buffer where to place next 
             for (int i = 0; i < particleCount*3 ; i++) {
                 retBuffer[c] = flatTriag[i].x/max_1d_mag;
-                std::cout<<retBuffer[c]<<",";
+                //std::cout<<retBuffer[c]<<",";
                 c++;
                 retBuffer[c] = flatTriag[i].y/max_1d_mag;
-                std::cout<<retBuffer[c]<<std::endl;
+                //std::cout<<retBuffer[c]<<std::endl;
                 c++;
             }
         
@@ -265,8 +241,8 @@ class testSim   {
         position randAdjust(unsigned i)   {
             //Makes a slight adjustment to the direction travelled rather than totally changing position
             position dir_t;
-            dir_t.x = (posL[i].x - prevPosL[i].x)+(rand()-RAND_MAX/2)%RAND_MAX/(double)RAND_MAX;
-            dir_t.y = (posL[i].y - prevPosL[i].y)+(rand()-RAND_MAX/2)%RAND_MAX/(double)RAND_MAX;
+            dir_t.x = (posL[i].x - prevPosL[i].x)+(rand()-RAND_MAX/2)%RAND_MAX/(double)RAND_MAX*0.005;
+            dir_t.y = (posL[i].y - prevPosL[i].y)+(rand()-RAND_MAX/2)%RAND_MAX/(double)RAND_MAX*0.005;
             double mag = sqrt(pow(dir_t.x,2)+pow(dir_t.y,2));
             dir_t.x = dir_t.x/mag;
             dir_t.y = dir_t.y/mag;
@@ -290,7 +266,10 @@ class testSim   {
                     dir[i] = moveAwayDir(posL[i],posL[nnIndex]);
                 }else   { 
                     //dir_t = randWalk(); 
-                    dir[i] = randAdjust(i);
+                    
+                    if(((double)rand()/RAND_MAX)<0.25) {
+                        dir[i] = randAdjust(i);
+                    }
                 }
 
                 
