@@ -13,18 +13,15 @@
 
 
 int main()	{
-	const unsigned int particleCount= 5; //IS actually a few less than this
+	const unsigned int particleCount= 200; //IS actually a few less than this
 	const unsigned int dimensionCount=2;
 	const double dt_speed = 100;//Constant on the stepsize as movement is done on unit method
 	const int k=100;//Density effectively (higher k lower density)
 	const float SLEEP_C= 0.95;//COnst on time to sleep to improve visibility
 	GLWrap test(particleCount,dimensionCount);
-	
-			//             SPeed,Konst
+
 	testSim testSimObj(particleCount,dt_speed,k);	
-	//testSimObj.timeStep();
-	//
-	int c =0;
+
 	while(!test.getExitAnimation())	{
 	    testSimObj.timeStep();
 	   
@@ -32,13 +29,10 @@ int main()	{
 		test.screenClear();
 		test.draw(testSimObj.getBuffer());
 		test.updateScreen();
-	    usleep(40000);
-	    //std::cout<<"HERE\n";
-	    //sleep(0.95);
-	    //std::cin.get();
-	    
-		c++;
-	//std::cout <<c<<std::endl;
+	    usleep(40000); //Adds 25 fps calc
+	
+	
+
 	}
 	test.exitWindow();
 

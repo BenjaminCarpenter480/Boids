@@ -19,7 +19,8 @@ class testSim   {
         position * prevPosL;
         position * dir;
         const float radius_d = 400; 
-        const double angle_d =M_PI_2;
+        const double angle_d =M_PI*2/3;
+        const double MOVE_APART_DIST = 250;
         
         float dt = 0.05 ;
     
@@ -135,8 +136,8 @@ class testSim   {
                 
                 //Calc A Side Pos
                 j++;
-                flatTriag[j].x = posL[i].x + radius_d*(dir[i].x*cos(angle_d)-dir[i].y*sin(angle_d));
-                flatTriag[j].y = posL[i].y + radius_d*(dir[i].y*cos(angle_d)+dir[i].x*sin(angle_d));
+                flatTriag[j].x = posL[i].x + (radius_d/2)*(dir[i].x*cos(angle_d)-dir[i].y*sin(angle_d));
+                flatTriag[j].y = posL[i].y + (radius_d/2)*(dir[i].y*cos(angle_d)+dir[i].x*sin(angle_d));
 
                 max_1d_mag =  updateMax1DMag(flatTriag[j],max_1d_mag);
 
@@ -145,8 +146,8 @@ class testSim   {
                 //Calc B side pos
                 
                 j++;
-                flatTriag[j].x = posL[i].x + radius_d*(dir[i].x*cos(-1*angle_d)-dir[i].y*sin(-1*angle_d));
-                flatTriag[j].y = posL[i].y + radius_d*(dir[i].y*cos(-1*angle_d)+dir[i].x*sin(-1*angle_d));
+                flatTriag[j].x = posL[i].x + (radius_d/2)*(dir[i].x*cos(-1*angle_d)-dir[i].y*sin(-1*angle_d));
+                flatTriag[j].y = posL[i].y + (radius_d/2)*(dir[i].y*cos(-1*angle_d)+dir[i].x*sin(-1*angle_d));
                 max_1d_mag =  updateMax1DMag(flatTriag[j],max_1d_mag);
 
                 //std::cout<<i<<":\n    ("<<flatTriag[j-2].x<<","<<flatTriag[j-2].y<<")\n("<<flatTriag[j-1].x<<","<<flatTriag[j-1].y<<")\n("<<flatTriag[j].x<<","<<flatTriag[j].y<<")\n";
@@ -210,8 +211,10 @@ class testSim   {
             position diffs;
             diffs.x = xT-xS;
             diffs.y = yT-yS;
-            retPos.y =  diffs.x; 
-            retPos.x = -diffs.y;
+            double mag = sqrt(pow(diffs.x,2)+pow(diffs.y,2));
+            retPos.y =  -diffs.x/mag; 
+            retPos.x = -diffs.y/mag;
+            
             //retPos.x = retPos.x/sqrt(pow(diffs.x,2)   + pow(diffs.y,2));
             //retPos.y = retPos.y/sqrt(pow(diffs.x,2)   + pow(diffs.y,2));
              
@@ -262,7 +265,7 @@ class testSim   {
                 unsigned int nnIndex = findNearestNeighbour(i);
                 //position dir_t;
                 //= moveAwaydir_t(posL[i].x,posL[i].y,posL[nnIndex].x,posL[nnIndex].y);
-                if(distBetween(posL[i],posL[nnIndex])<100)    {
+                if(distBetween(posL[i],posL[nnIndex])<MOVE_APART_DIST)    {
                     dir[i] = moveAwayDir(posL[i],posL[nnIndex]);
                 }else   { 
                     //dir_t = randWalk(); 
