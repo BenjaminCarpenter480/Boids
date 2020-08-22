@@ -26,6 +26,7 @@ class Boids   {
         const float radius_d = 400; 
         const double angle_d =M_PI*2/3;
         const double MOVE_APART_DIST = 250;
+        const double COPY_MOVE_DIST = 500;
         
         float dt = 0.05 ;
     
@@ -232,7 +233,13 @@ class Boids   {
         }
         
 
-        //vector moveCopyDir(vector
+        vector moveCopyDir(unsigned int nnIndex)    {
+            //Simply returns same direction, might need improvement (esp. efficiency)
+            vector retDir;
+            retDir.x = dir[nnIndex].x;
+            retDir.y = dir[nnIndex].y;
+            return retDir ;
+        }
 
 
         double distBetween(vector A, vector B)  {
@@ -262,7 +269,7 @@ class Boids   {
         
 
         void timeStep() {//Position updater function
-            std::cout<<"Timestep\n";
+            //std::cout<<"Timestep\n";
             for (int i= 0; i<particleCount/*sizeof(*posL)/sizeof(*vector)*/;i++)    {
                
                 //Update the previous position 
@@ -271,9 +278,8 @@ class Boids   {
                 
 
                 unsigned int nnIndex = findNearestNeighbour(i);
-                //position dir_t;
-                //= moveAwaydir_t(posL[i].x,posL[i].y,posL[nnIndex].x,posL[nnIndex].y);
-                if(distBetween(posL[i],posL[nnIndex])<MOVE_APART_DIST)    {
+                double distToNN = distBetween(posL[i],posL[nnIndex]);
+                 if(distToNN<MOVE_APART_DIST)    {
                     dir[i] = moveAwayDir(posL[i],posL[nnIndex]);
                 }else   { 
                     //dir_t = randWalk(); 
@@ -293,6 +299,7 @@ class Boids   {
                 //std::cout<<"dr:"<<dir.x<<","<<dir.y<<std::endl; 
                 //std::cout<<"Positions:"<<posL[i].x<<","<<posL[i].y<<std::endl;
             }
+            std::cout<<"\n";
          
                 
         }

@@ -9,7 +9,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build-dir/HelloGL",
+            "program": "${workspaceFolder}/build-dir/BoidsAnimation",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
