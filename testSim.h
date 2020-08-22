@@ -1,7 +1,8 @@
 /*
  *
- * TODO: RENAME position struct to vector
- * UPDATE BASE MOVEMENT FROM RANDOM WALK TO ONLY A SLIGHT CHANGE FROM THE PREVIOUS DIRECTION 
+ * TODO: 
+ * Off edge of screen issues
+ * Move away dir causes issues (Not normalised??)
  */
 
 
@@ -16,10 +17,45 @@ class testSim   {
         };
         position * posL;
         position * prevPosL;
+        position * dir;
+        const float radius_d = 400; 
+        const double angle_d =M_PI_2;
+        
         float dt = 0.05 ;
     
         unsigned int particleCount;
-        
+        position* normaliseArr(position* arr,int size) {
+            /*
+             * Normalisation function used by opengl to display points
+             */
+            double maxDistX = arr[0].x;
+            double maxDistY = arr[0].y; 
+            for (int i = 1; i < size ; i++) {
+                 if (maxDistX < arr[i].x)  {
+                    maxDistX =  arr[i].x;   
+                 }
+                 if (maxDistY < arr[i].y)   {
+                     maxDistY = arr[i].y;
+                }
+            }
+             
+            position* arrRet = new position[size];
+           
+            if(maxDistX>maxDistY)   {
+                for (int i = 0; i < particleCount ; i++) {
+                    arrRet[i].x = arr[i].x/maxDistX;
+                    arrRet[i].y = arr[i].y/maxDistX;
+                }
+            }else    {
+                for (int i = 0; i < particleCount ; i++) {
+                    arrRet[i].x = arr[i].x/maxDistY;
+                    arrRet[i].y = arr[i].y/maxDistY;
+                }
+            }
+            
+            return arrRet;
+        }
+
         position* normalisePosArr() {
             /*
              * Normalisation function used by opengl to display points
@@ -36,6 +72,7 @@ class testSim   {
             }
              
             position* posLRet = new position[particleCount];
+           
             if(maxDistX>maxDistY)   {
                 for (int i = 0; i < particleCount ; i++) {
                     posLRet[i].x = posL[i].x/maxDistX;
@@ -50,14 +87,28 @@ class testSim   {
             
             return posLRet;
         }
+
+
+        double updateMax1DMag(position test_pos, double max_mag)  {
+            if(test_pos.x>max_mag)    {
+                max_mag = test_pos.x;
+                
+            }else if(test_pos.y>max_mag)   {
+                max_mag = test_pos.y ;
+            }
+            return max_mag;     
+                
+        }
     
     public:
         const unsigned int dimensionality = 2;
         double * getBuffer() {
+            //SETUP BUFFER AND NORMALISED POSITIONS
             position * posLNorm = normalisePosArr();//GEt normalised points in allowed form [-1,1]
-            double * retBuffer = new double[particleCount*dimensionality+dimensionality*dimensionality*2];//Buffer to return and send to gpu
-           
-            //Must flatten 2d array 
+            double * retBuffer = new double[particleCount*dimensionality*3+dimensionality*dimensionality*2];//Buffer to return and send to gpu
+            position * flatTriag = new position[particleCount*3];
+
+            //AXES LINES POSTIONS
             retBuffer[0] = 0;
             retBuffer[1] = 0;
 
@@ -71,37 +122,89 @@ class testSim   {
             retBuffer[6] = 1;
             retBuffer[7] = 0;
 
-            std::cout<<retBuffer[0]<<std::endl;
-            std::cout<<retBuffer[1]<<std::endl;
-            std::cout<<retBuffer[2]<<std::endl;
-            std::cout<<retBuffer[3]<<std::endl;
-            unsigned int c = 8;//Track position in new array/buffer where to place next 
+            //Setup arrow coords
+            double max_1d_mag=0; 
+            unsigned int j = 0;//Track position in new array/buffer where to place next 
             for (int i = 0; i < particleCount ; i++) {
-                retBuffer[c] = posLNorm[i].x;
-                std::cout<<retBuffer[c]<<std::endl;
+                
+                //Calc Tip position
+                
+                flatTriag[j].x = posL[i].x + radius_d*dir[i].x;
+                flatTriag[j].y = posL[i].y + radius_d*dir[i].y; 
+                max_1d_mag =  updateMax1DMag(flatTriag[j],max_1d_mag);
+                
+                //Calc A Side Pos
+                j++;
+                flatTriag[j].x = posL[i].x + radius_d*(dir[i].x*cos(angle_d)-dir[i].y*sin(angle_d));
+                flatTriag[j].y = posL[i].y + radius_d*(dir[i].y*cos(angle_d)+dir[i].x*sin(angle_d));
+
+                max_1d_mag =  updateMax1DMag(flatTriag[j],max_1d_mag);
+
+              
+                
+                //Calc B side pos
+                
+                j++;
+                flatTriag[j].x = posL[i].x + radius_d*(dir[i].x*cos(-1*angle_d)-dir[i].y*sin(-1*angle_d));
+                flatTriag[j].y = posL[i].y + radius_d*(dir[i].y*cos(-1*angle_d)+dir[i].x*sin(-1*angle_d));
+                max_1d_mag =  updateMax1DMag(flatTriag[j],max_1d_mag);
+
+                //std::cout<<i<<":\n    ("<<flatTriag[j-2].x<<","<<flatTriag[j-2].y<<")\n("<<flatTriag[j-1].x<<","<<flatTriag[j-1].y<<")\n("<<flatTriag[j].x<<","<<flatTriag[j].y<<")\n";
+                j++;
+                
+               
+            }
+
+            
+            
+            
+            //Must flatten 2d array of positions
+            //MUST BE NORMALISED SOMWHERE BELOW
+            unsigned int c = 8;//Track position in new array/buffer where to place next 
+            for (int i = 0; i < particleCount*3 ; i++) {
+                retBuffer[c] = flatTriag[i].x/max_1d_mag;
+                //std::cout<<retBuffer[c]<<",";
                 c++;
-                retBuffer[c] = posLNorm[i].y;
-                std::cout<<retBuffer[c]<<std::endl;
+                retBuffer[c] = flatTriag[i].y/max_1d_mag;
+                //std::cout<<retBuffer[c]<<std::endl;
                 c++;
-        }
+            }
         
         return retBuffer;
         }
 
-        unsigned int findNearestNeighbour(unsigned int index)    {
+        unsigned int findFurthestNeighbour(unsigned int index)    {
             double maxDist = sqrt(pow(posL[0].x,2)+pow(posL[0].y,2)); 
             unsigned int nnIndex = 0;
             for (int i = 1; i < particleCount ; i++) {
-                double currentDist = sqrt(pow(posL[i].x,2)+pow(posL[i].y,2))  ; 
-                if (maxDist< currentDist)  {
-                    maxDist = currentDist;
-                    nnIndex = i;
+                if (index != i) {
+                    double currentDist = sqrt(pow(posL[i].x,2)+pow(posL[i].y,2))  ; 
+                    if (maxDist < currentDist)  {
+                        maxDist = currentDist;
+                        nnIndex = i;
+                    }
                 }
             }
             return nnIndex;
         }
 
-        position moveAwayDir(unsigned int xS, unsigned int yS,unsigned int xT, unsigned int yT)    {
+
+        unsigned int findNearestNeighbour(unsigned int index)    {
+            double minDist = 1e32; //sqrt(pow(posL[0].x,2)+pow(posL[0].y,2)); 
+            unsigned int nnIndex = 0;
+            for (int i = 0; i < particleCount ; i++) {
+                if (index != i) {
+                    double currentDist = sqrt(pow(posL[i].x-posL[index].x,2)+pow(posL[i].y-posL[index].y,2))  ; 
+                    if (minDist > currentDist)  {
+                        minDist = currentDist;
+                        nnIndex = i;
+                    }
+                }
+            }
+            return nnIndex;
+        }
+
+        position moveAwayDir(int xS, int yS, int xT, int yT)    {
         //MOVE PERPENDICULAR TO Nearest neighbour
             position retPos;
             position diffs;
@@ -114,6 +217,8 @@ class testSim   {
              
             return retPos;
         }
+
+
         position moveAwayDir(position self, position posAwayFrom)  {
             return moveAwayDir(self.x,self.y,posAwayFrom.x,posAwayFrom.y);
         }
@@ -125,22 +230,23 @@ class testSim   {
         
 
         position randWalk() {
-            position dir; 
-            dir.x= ((rand()-RAND_MAX/2)%RAND_MAX/(double)RAND_MAX);
+            position dir_t; 
+            dir_t.x= ((rand()-RAND_MAX/2)%RAND_MAX/(double)RAND_MAX);
              
-            dir.y= ((rand()-RAND_MAX/2)%RAND_MAX/(double)RAND_MAX);
+            dir_t.y= ((rand()-RAND_MAX/2)%RAND_MAX/(double)RAND_MAX);
 
-            return dir;
+            return dir_t;
         }
 
         position randAdjust(unsigned i)   {
-            position dir;
-            dir.x = (posL[i].x - prevPosL[i].x)+(rand()-RAND_MAX/2)%RAND_MAX/(double)RAND_MAX;
-            dir.y = (posL[i].y - prevPosL[i].y)+(rand()-RAND_MAX/2)%RAND_MAX/(double)RAND_MAX;
-            double mag = sqrt(pow(dir.x,2)+pow(dir.y,2));
-            dir.x = dir.x/mag;
-            dir.y = dir.y/mag;
-            return dir;
+            //Makes a slight adjustment to the direction travelled rather than totally changing position
+            position dir_t;
+            dir_t.x = (posL[i].x - prevPosL[i].x)+(rand()-RAND_MAX/2)%RAND_MAX/(double)RAND_MAX*0.005;
+            dir_t.y = (posL[i].y - prevPosL[i].y)+(rand()-RAND_MAX/2)%RAND_MAX/(double)RAND_MAX*0.005;
+            double mag = sqrt(pow(dir_t.x,2)+pow(dir_t.y,2));
+            dir_t.x = dir_t.x/mag;
+            dir_t.y = dir_t.y/mag;
+            return dir_t;
         }
         
 
@@ -154,28 +260,30 @@ class testSim   {
                 
 
                 unsigned int nnIndex = findNearestNeighbour(i);
-                position dir;
-                //= moveAwayDir(posL[i].x,posL[i].y,posL[nnIndex].x,posL[nnIndex].y);
+                //position dir_t;
+                //= moveAwaydir_t(posL[i].x,posL[i].y,posL[nnIndex].x,posL[nnIndex].y);
                 if(distBetween(posL[i],posL[nnIndex])<100)    {
-                    dir = moveAwayDir(posL[i],posL[nnIndex]);
+                    dir[i] = moveAwayDir(posL[i],posL[nnIndex]);
                 }else   { 
-                    //dir = randWalk(); 
-                    dir = randAdjust(i);
+                    //dir_t = randWalk(); 
+                    
+                    if(((double)rand()/RAND_MAX)<0.25) {
+                        dir[i] = randAdjust(i);
+                    }
                 }
 
                 
-
-                posL[i].x = posL[i].x +dt*dir.x;
-                posL[i].y = posL[i].y +dt*dir.y;
+                posL[i].x = posL[i].x +dt*dir[i].x;
+                posL[i].y = posL[i].y +dt*dir[i].y;
                 
                  
 
                 //std::cout<<"P:"<<i<<std::endl;
                 //std::cout<<"dr:"<<dir.x<<","<<dir.y<<std::endl; 
                 //std::cout<<"Positions:"<<posL[i].x<<","<<posL[i].y<<std::endl;
-                
             }
          
+                
         }
 
 
@@ -191,13 +299,15 @@ class testSim   {
             particleCount = pparticleCount;
             posL = new position[pparticleCount];
             prevPosL = new position[pparticleCount];
+            dir = new position[pparticleCount];
             for (int i= 0; i< pparticleCount ;i++)    {
+                //Setup initial posiitons and dir_tections
                 posL[i].x = (rand()-RAND_MAX/2)%k;
                 posL[i].y = (rand()-RAND_MAX/2)%k;
                 prevPosL[i].x = 0;
                 prevPosL[i].y = 0;
 
-                std::cout<<"START\n"<<i<<":"<<posL[i].x<<","<<posL[i].y<<std::endl;
+                //std::cout<<"START\n"<<i<<":"<<posL[i].x<<","<<posL[i].y<<std::endl;
             }
         }
         
