@@ -273,6 +273,7 @@ class Boids   {
             for (int i= 0; i<particleCount/*sizeof(*posL)/sizeof(*vector)*/;i++)    {
                
                 //Update the previous position 
+                
                 prevPosL[i].x = posL[i].x;
                 prevPosL[i].y = posL[i].y;
                 
