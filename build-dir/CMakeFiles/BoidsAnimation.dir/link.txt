@@ -1,1 +1,0 @@
-/usr/bin/c++  -g  -rdynamic CMakeFiles/BoidsAnimation.dir/main.cpp.o  -o BoidsAnimation -Wl,-rpath,/home/benjamin/Desktop/OpenGL/build-dir/lib /usr/lib/x86_64-linux-gnu/libGL.so lib/libGLEWd.so.2.1.0 glfw-3.3.2/src/libglfw3.a -lGL -lGLU -lrt -lm -ldl -lX11 -lpthread 
