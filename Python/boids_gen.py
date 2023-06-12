@@ -1,9 +1,13 @@
+import logging
+import os
 from random import randint, random
 import time
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import numpy as np
 from numpy.linalg import norm
+
+PIPE = "/tmp/boids"
 
 DOMAIN = 1000
 NUM_BOIDS = 20
@@ -33,13 +37,17 @@ class Space():
         for i in range(NUM_BOIDS):
             self.boid_list.append(boid(self.boid_list,randint(1,DOMAIN), randint(1,DOMAIN), (random()), random(),randint(0,1)))
             time.sleep(0.1)
-        self.start_animation()
-            
-    def update(self, i):
+
+
+
+    def update(self, i, pipe_read):
         self._update_axis()
-        for b in self.boid_list:
-            b.move()
-            self.ax.quiver(b.position[0],b.position[1], b.velocity[0], b.velocity[1],headlength=norm(b.velocity) )
+        
+        for boid in pipe_read.readline.split(';'):
+            b=boid.split(',')
+            self.ax.quiver(float(b[0]),float(b[1]),float(b[2]),float(b[3]),
+                           headlength=norm([float(b[2]),float(b[3])]) )            
+
 
     def _update_axis(self):
         self.ax.clear()
@@ -48,18 +56,49 @@ class Space():
         self.ax.set_xbound([0.1, DOMAIN])
         self.ax.set_ybound([0.1, DOMAIN])
 
-    def start_animation(self):
-        ani = FuncAnimation(self.fig, self.update, blit=True, interval=1)
-        plt.show()
+    def startup(self):
+        try:
+            try:
+                os.remove(PIPE)
+            except FileNotFoundError:
+                pass
+    
+            os.mkfifo(PIPE)
+            logging.info("Pipe created")
+            self.pipe = open(PIPE, 'w')
+            self.sim_loop()
+        except FileExistsError as e:
+            logging.error(f"Error in simulator: {e.strerror}")
+        finally:
+            try:
+                os.remove(PIPE)
+            except FileNotFoundError:
+                pass
+            logging.info("Pipe removed")
+    
+    
+    def sim_loop(self):
+        #Should probably keep open all loop so not read during write
+        while True:
+            for b in self.boid_list:
 
-
+                b.move()
+                b.write(self.pipe)
+               
+            self.pipe.write("\n")
+            # time.sleep(1)
+            print("loop")
+            
 class boid():
-
     def __init__(self,boids, x, y, vx, vy,bias=False) -> None:
         self._position = np.array([x,y],dtype=float)
         self._velocity = np.array([vx,vy],dtype=float)
         self._boids = boids
         self.bias = bias
+
+    def write(self,pipe):
+        pipe.write(f'{self.x},{self.y},{self.vx},{self.vy};')
+
 
     def move(self):
         #Move together
@@ -191,5 +230,5 @@ class boid():
 
 if __name__ == "__main__":
     boids = Space()
-    plt.show()
+    boids.startup()
 
