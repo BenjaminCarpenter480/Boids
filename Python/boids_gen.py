@@ -11,6 +11,7 @@ PIPE = "/tmp/boids"
 
 DOMAIN = 1000
 NUM_BOIDS = 20
+STEP_SIZE=1
 
 turn_speed = 1
 left_margin = 0.2*DOMAIN
@@ -137,7 +138,7 @@ class boid():
             self.velocity = (self.velocity/speed)*min_speed
 
 
-        self.position += self.velocity
+        self.position += self.velocity*STEP_SIZE
 
     def handle_edges(self):
         """

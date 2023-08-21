@@ -1,6 +1,7 @@
 
 
 
+import queue
 import time
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -18,27 +19,31 @@ DOMAIN = boids_gen.DOMAIN
 
 class Display():
 
-    self.buffer = []
 
     def __init__(self) -> None:
         self.fig, self.ax = plt.subplots()
         time.sleep(2)
-        self.pipe = open(PATH, "r")        
-
+        self.pipe = open(PATH, "r")
+        self.data = queue.Queue()
 
     def update(self, i):
         self._update_axis()
-
-        data = self.pipe.readline()
-        print(data.split(';')[:-1])
+        while self.data.qsize() == 0:
+            self.empty_pipe()
+        data = self.data.get()
         for boid in data.split(';')[:-1]:
             print(boid)
             b=boid[:-1].split(',')
             self.ax.quiver(float(b[0]),float(b[1]),float(b[2]),float(b[3]),
                         headlength=norm([float(b[2]),float(b[3])]) )
-        print("---------LOOPED----------") 
+        # print("---------LOOPED----------") 
             
             
+    def empty_pipe(self): 
+        count = 0
+        while self.pipe.readable() and count < 500:
+            self.data.put(self.pipe.readline())
+            count = count +1
 
     
     
@@ -52,7 +57,7 @@ class Display():
 
     def startup(self):
 
-        ani = FuncAnimation(self.fig, self.update, blit=False, interval=1)
+        ani = FuncAnimation(self.fig, self.update, blit=False, interval=0.001)
         plt.show(block=True)
    
 if __name__ == "__main__":
