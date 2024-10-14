@@ -9,7 +9,7 @@ from numpy.linalg import norm
 PIPE = "/tmp/boids"
 
 DOMAIN = 250
-NUM_BOIDS = 20
+NUM_BOIDS = 40
 STEP_SIZE=1
 
 turn_speed = 1

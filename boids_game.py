@@ -1,6 +1,7 @@
 import logging
 import queue
 from random import randint, random
+import threading
 import time
 
 import numpy as np
@@ -58,19 +59,22 @@ class Game_Space():
     # pipe handling and update code
 
     def pipe_init(self):
-            self.pipe = open(boids_gen.PIPE, "rb")
-            self.data = queue.Queue()
+        self.pipe = open(boids_gen.PIPE, "rb")
+        self.data = queue.Queue()
+        self.pipe_reader = threading.Thread(target=self.empty_pipe)
+        self.pipe_reader.start()
 
 
     def empty_pipe(self):
-        count = 0
-        while self.pipe.readable() and count < 500:
+        # count = 0
+        while self.pipe.readable():  # and count < 500:
             self.data.put(self.pipe.readline())
-            count = count +1
+            # count = count +1
+        
 
     def update_boids(self):
-        while self.data.qsize() == 0:
-            self.empty_pipe()
+        # while self.data.qsize() == 0: #Convert to ASYNC?  
+            
         
         data = self.data.get().decode('ASCII')
         boids_from_pipe = data.split(';')
@@ -78,14 +82,11 @@ class Game_Space():
         self.logger.debug("Displaying %d boids", len(boids_from_pipe))
         for i in range(len(boids_from_pipe)-1):
             self.boid_list[i].kinematic_vector=np.array(boids_from_pipe[i].split(','),dtype=float)
-            # self.boid_list[i].draw()
 
 
     def update(self):
-        #Do something!
         self.update_boids()
 
-        #Then
         for event in pygame.event.get(): #Get all events in the queue
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -95,7 +96,7 @@ class Game_Space():
         while True:
             self.update()
             pygame.display.update() #Update the displaypane
-            time.sleep(0.01)
+            time.sleep(1/60) # 30  fps
             self.world.fill(BACKGROUND_COLOR) #Clear the displaypane
 
 if __name__== '__main__':
