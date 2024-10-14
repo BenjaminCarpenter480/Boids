@@ -43,18 +43,18 @@ class Space():
     def update(self, i, pipe_read):
         self._update_axis()
         
-        for boid in pipe_read.readline.split(';'):
-            b=boid.split(',')
-            self.ax.quiver(float(b[0]),float(b[1]),float(b[2]),float(b[3]),
-                           headlength=norm([float(b[2]),float(b[3])]) )            
+    #     for boid in pipe_read.readline.split(';'):
+    #         b=boid.split(',')
+    #         self.ax.quiver(float(b[0]),float(b[1]),float(b[2]),float(b[3]),
+    #                        headlength=norm([float(b[2]),float(b[3])]) )            
 
 
-    def _update_axis(self):
-        self.ax.clear()
-        self.ax.set_xlim([0.1, DOMAIN])
-        self.ax.set_ylim([0.1, DOMAIN])
-        self.ax.set_xbound([0.1, DOMAIN])
-        self.ax.set_ybound([0.1, DOMAIN])
+    # def _update_axis(self):
+    #     self.ax.clear()
+    #     self.ax.set_xlim([0.1, DOMAIN])
+    #     self.ax.set_ylim([0.1, DOMAIN])
+    #     self.ax.set_xbound([0.1, DOMAIN])
+    #     self.ax.set_ybound([0.1, DOMAIN])
 
     def startup(self):
         try:
@@ -145,8 +145,8 @@ class boid():
         speed =norm(self.velocity)
         if speed>max_speed:
             self.velocity = (self.velocity/speed)*max_speed
-        elif speed<min_speed:
-            self.velocity = (self.velocity/speed)*min_speed
+        # elif speed<min_speed:
+        #     self.velocity = (self.velocity/speed)*min_speed
 
     def handle_edges(self):
         """
@@ -197,7 +197,6 @@ class boid():
     
     @velocity.setter
     def velocity(self, value):
-        assert value.any()<1000
         self._velocity = value 
 
     @property
