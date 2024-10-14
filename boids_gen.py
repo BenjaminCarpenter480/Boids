@@ -6,9 +6,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy.linalg import norm
 
+import constants
+
 PIPE = "/tmp/boids"
 
-DOMAIN = 250
+DOMAIN = constants.DOMAIN
 NUM_BOIDS = 40
 STEP_SIZE=1
 
@@ -126,8 +128,8 @@ class boid():
         speed =norm(self.velocity)
         if speed>max_speed:
             self.velocity = (self.velocity/speed)*max_speed
-        # elif speed<min_speed:
-        #     self.velocity = (self.velocity/speed)*min_speed
+        elif speed<min_speed:
+            self.velocity = (self.velocity/speed)*min_speed
 
     def handle_edges(self):
         """

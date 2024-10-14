@@ -1,6 +1,6 @@
 import logging
 import queue
-from random import randint, random
+from random import randint
 import threading
 import time
 
@@ -46,7 +46,18 @@ class Game_Space():
     boid_list = []
     def __init__(self) -> None:
         pygame.init()
-        self.world = pygame.display.set_mode((constants.DOMAIN, constants.DOMAIN))
+
+        print(pygame.display.get_desktop_sizes())
+        win_size_x = pygame.display.get_desktop_sizes()[0][0]
+        win_size_y = pygame.display.get_desktop_sizes()[0][1]
+        if(constants.DOMAIN < win_size_x or constants.DOMAIN < win_size_y):
+            win_size_x = constants.DOMAIN
+            win_size_y = constants.DOMAIN
+        else:
+            win_size_x = int(win_size_x*0.8)
+            win_size_y = int(win_size_y*0.8)
+
+        self.world = pygame.display.set_mode((win_size_x, win_size_y)) 
         for i in range(constants.NUM_BOIDS):
             self.boid_list.append(boid_sprite(randint(1,constants.DOMAIN),
                                               randint(1,constants.DOMAIN),
@@ -67,9 +78,8 @@ class Game_Space():
 
     def empty_pipe(self):
         # count = 0
-        while self.pipe.readable():  # and count < 500:
+        while self.pipe.readable():
             self.data.put(self.pipe.readline())
-            # count = count +1
         
 
     def update_boids(self):
