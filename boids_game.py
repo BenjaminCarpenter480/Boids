@@ -58,7 +58,7 @@ class Game_Space():
     # pipe handling and update code
 
     def pipe_init(self):
-            self.pipe = open(boids_gen.PIPE, "r")
+            self.pipe = open(boids_gen.PIPE, "rb")
             self.data = queue.Queue()
 
 
@@ -72,7 +72,7 @@ class Game_Space():
         while self.data.qsize() == 0:
             self.empty_pipe()
         
-        data = self.data.get()
+        data = self.data.get().decode('ASCII')
         boids_from_pipe = data.split(';')
         
         self.logger.debug("Displaying %d boids", len(boids_from_pipe))

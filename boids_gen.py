@@ -34,27 +34,9 @@ class Space():
         self.fig, self.ax = plt.subplots()
         self.boid_list = []
 
-        for i in range(NUM_BOIDS):
+        for _ in range(NUM_BOIDS):
             self.boid_list.append(boid(self.boid_list,randint(1,DOMAIN), randint(1,DOMAIN), (random()), random(),randint(0,1)))
             time.sleep(0.1)
-
-
-
-    def update(self, i, pipe_read):
-        self._update_axis()
-        
-    #     for boid in pipe_read.readline.split(';'):
-    #         b=boid.split(',')
-    #         self.ax.quiver(float(b[0]),float(b[1]),float(b[2]),float(b[3]),
-    #                        headlength=norm([float(b[2]),float(b[3])]) )            
-
-
-    # def _update_axis(self):
-    #     self.ax.clear()
-    #     self.ax.set_xlim([0.1, DOMAIN])
-    #     self.ax.set_ylim([0.1, DOMAIN])
-    #     self.ax.set_xbound([0.1, DOMAIN])
-    #     self.ax.set_ybound([0.1, DOMAIN])
 
     def startup(self):
         try:
@@ -65,7 +47,7 @@ class Space():
     
             os.mkfifo(PIPE)
             logging.info("Pipe created")
-            self.pipe = open(PIPE, 'w')
+            self.pipe = open(PIPE, 'wb' )
             self.sim_loop()
         except FileExistsError as e:
             logging.error(f"Error in simulator: {e.strerror}")
@@ -81,12 +63,11 @@ class Space():
         #Should probably keep open all loop so not read during write
         while True:
             for b in self.boid_list:
-
                 b.move()
                 # print("Waiting on write")
                 b.write(self.pipe)
                 # print("Written")
-            self.pipe.write("\n")
+            self.pipe.write(bytes("\n",encoding='ASCII'))
             # time.sleep(1)
 
 
@@ -98,7 +79,7 @@ class boid():
         self.bias = bias
 
     def write(self,pipe):
-        pipe.write(f'{self.x},{self.y},{self.vx},{self.vy};')
+        pipe.write(bytes(f'{self.x},{self.y},{self.vx},{self.vy};', 'ASCII'))
 
 
     def move_together(self):
