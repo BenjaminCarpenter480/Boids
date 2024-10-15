@@ -5,57 +5,38 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.linalg import norm
+from parameters import Parameters
 
-import constants
-
-PIPE = "/tmp/boids"
-
-DOMAIN = constants.DOMAIN
-NUM_BOIDS = 40
-STEP_SIZE=1
-
-turn_speed = 1
-left_margin = 0.2*DOMAIN
-right_margin = 0.8*DOMAIN
-bottom_margin = 0.2*DOMAIN
-top_margin = 0.8*DOMAIN
-
-min_seperation = 0.05*DOMAIN
-move_away_factor = 0.01
-
-visual_dist = 0.1*DOMAIN
-match_speed_factor = 0.1
-
-centering_factor = 0
-
-max_speed = 50
-min_speed = 1
 
 class Space():
     def __init__(self) -> None:
+        np.random.seed()
         self.fig, self.ax = plt.subplots()
         self.boid_list = []
 
-        for _ in range(NUM_BOIDS):
-            self.boid_list.append(boid(self.boid_list,randint(1,DOMAIN), randint(1,DOMAIN), (random()), random(),randint(0,1)))
-            time.sleep(0.1)
+        for _ in range(Parameters.NUM_BOIDS):
+            self.boid_list.append(boid(self.boid_list,randint(1,Parameters.DOMAIN),
+                                        randint(1,Parameters.DOMAIN),
+                                        (random()),
+                                        random(),
+                                        randint(0,1)))
 
     def startup(self):
         try:
             try:
-                os.remove(PIPE)
+                os.remove(Parameters.PIPE)
             except FileNotFoundError:
                 pass
     
-            os.mkfifo(PIPE)
+            os.mkfifo(Parameters.PIPE)
             logging.info("Pipe created")
-            self.pipe = open(PIPE, 'wb' )
+            self.pipe = open(Parameters.PIPE, 'wb' )
             self.sim_loop()
         except FileExistsError as e:
-            logging.error(f"Error in simulator: {e.strerror}")
+            logging.error("Error in simulator: %s", e.strerror)
         finally:
             try:
-                os.remove(PIPE)
+                os.remove(Parameters.PIPE)
             except FileNotFoundError:
                 pass
             logging.info("Pipe removed")
@@ -70,7 +51,6 @@ class Space():
                 b.write(self.pipe)
                 # print("Written")
             self.pipe.write(bytes("\n",encoding='ASCII'))
-            # time.sleep(1)
 
 
 class boid():
@@ -92,19 +72,19 @@ class boid():
 
         average_vel = np.array([0,0],dtype=float)
         average_pos = np.array([0,0],dtype=float)
-        neighbours = 0
+        num_neighbours = 0
         for ob in self._boids:
-            if(norm(ob.position - self.position) < visual_dist):
+            if(norm(ob.position - self.position) < Parameters.visual_dist):
                 average_vel += ob.velocity
                 average_pos += ob.position
-                neighbours += 1
+                num_neighbours += 1
                 
-        if(neighbours > 0):
-            average_vel = average_vel/neighbours
-            self.velocity += (average_vel-self.velocity)*match_speed_factor
+        if(num_neighbours > 0):
+            average_vel = average_vel/num_neighbours
+            self.velocity += (average_vel-self.velocity)*Parameters.match_speed_factor
             
-            average_pos = average_pos/neighbours
-            self.velocity += (average_pos-self.position)*centering_factor
+            average_pos = average_pos/num_neighbours
+            self.velocity += (average_pos-self.position)*Parameters.centering_factor
 
 
     def move(self):
@@ -122,14 +102,14 @@ class boid():
 
         self.limit_speed()
 
-        self.position += self.velocity*STEP_SIZE
+        self.position += self.velocity*Parameters.STEP_SIZE
 
     def limit_speed(self):
         speed =norm(self.velocity)
-        if speed>max_speed:
-            self.velocity = (self.velocity/speed)*max_speed
-        elif speed<min_speed:
-            self.velocity = (self.velocity/speed)*min_speed
+        if speed>Parameters.max_speed:
+            self.velocity = (self.velocity/speed)*Parameters.max_speed
+        elif speed<Parameters.min_speed:
+            self.velocity = (self.velocity/speed)*Parameters.min_speed
 
     def handle_edges(self):
         """
@@ -139,14 +119,14 @@ class boid():
         """
         #TODO: We want turn speed to be a function of the distance from the wall, increasing the 
         # closer we are to the wall (so the boid doesn't hit the wall!)
-        if self.x < left_margin:
-            self.vx = self.vx+turn_speed 
-        if self.x > right_margin:
-            self.vx = self.vx-turn_speed
-        if self.y < bottom_margin:
-            self.vy = self.vy+turn_speed 
-        if self.y > top_margin:
-            self.vy = self.vy-turn_speed
+        if self.x < Parameters.left_margin:
+            self.vx = self.vx+Parameters.turn_speed 
+        if self.x > Parameters.right_margin:
+            self.vx = self.vx-Parameters.turn_speed
+        if self.y < Parameters.bottom_margin:
+            self.vy = self.vy+Parameters.turn_speed 
+        if self.y > Parameters.top_margin:
+            self.vy = self.vy-Parameters.turn_speed
 
     def move_away(self):
         """
@@ -157,10 +137,10 @@ class boid():
         """
         move_away_vec = np.array([0,0],dtype=float)
         for ob in self._boids:
-            if(norm(ob.position - self.position) < min_seperation):
+            if(norm(ob.position - self.position) < Parameters.min_seperation):
                 move_away_vec += self.position - ob.position
 
-        self.velocity += move_away_vec*move_away_factor                
+        self.velocity += move_away_vec*Parameters.move_away_factor                
 
 
     #Getters and Setters    
@@ -170,12 +150,10 @@ class boid():
     
     @position.setter
     def position(self, value):
-        assert value.any() < 1000
         self._position = value
 
     @property
     def velocity(self):
-        
         return self._velocity
     
     @velocity.setter
@@ -215,6 +193,6 @@ class boid():
         self._velocity[1] = value
 
 if __name__ == "__main__":
-    boids = Space()
-    boids.startup()
+    space = Space()
+    space.startup()
 
