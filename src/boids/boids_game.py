@@ -9,6 +9,34 @@ import pygame
 from parameters import Parameters as params
 BACKGROUND_COLOR = (255,255,255)
 
+class PipeReadHandler():
+    """
+    For reading data from the generator object
+
+    Data is returned as a string with each boid seperated by a ';' and each "," seperating the boid
+    attributes in the form x,y,vx,vy
+    """
+
+    def __init__(self, pipe_address=params.PIPE) -> None:
+        """Class to handle reading from the pipe
+        """
+        self.__pipe = open(pipe_address,"rb")
+        self.__data = queue.Queue()
+        self.__pipe_reader = threading.Thread(target=self.empty_pipe)
+        self.__pipe_reader.start()
+
+    def empty_pipe(self):
+        """
+        Read from the pipe and put the data in the queue to be accessed by the process
+        """
+        while self.__pipe.readable():
+            self.__data.put(self.__pipe.readline())
+
+    def get_data(self):
+        """Data stored in the pipe
+        """
+        return self.__data.get().decode('ASCII')
+
 class BoidSprite():
     def __init__(self, x, y, vx, vy, world) -> None:
         self.kinematic_array  = np.array([0, 0, 0, 0])
@@ -37,33 +65,6 @@ class BoidSprite():
         return (x_t, y_t)
 
 
-class PipeReadHandler():
-    """
-    For reading data from the generator object
-
-    Data is returned as a string with each boid seperated by a ';' and each "," seperating the boid
-    attributes in the form x,y,vx,vy
-    """
-
-    def __init__(self, pipe_address=params.PIPE) -> None:
-        """Class to handle reading from the pipe
-        """
-        self.__pipe = open(pipe_address,"rb")
-        self.__data = queue.Queue()
-        self.__pipe_reader = threading.Thread(target=self.empty_pipe)
-        self.__pipe_reader.start()
-
-    def empty_pipe(self):
-        """
-        Read from the pipe and put the data in the queue to be accessed by the process
-        """
-        while self.__pipe.readable():
-            self.__data.put(self.__pipe.readline())
-
-    def get_data(self):
-        """Data stored in the pipe
-        """
-        return self.__data.get().decode('ASCII')
 
 
 class GameVisuliser():
@@ -95,8 +96,6 @@ class GameVisuliser():
     def update_boids(self):
         # while self.data.qsize() == 0:
         # TODO Convert to using ASYNC in place of threads and wait here?
-
-
         data = self.pipe_access.get_data()
         boids_from_pipe = data.split(';')
 
