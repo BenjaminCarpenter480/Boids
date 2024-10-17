@@ -6,14 +6,14 @@ import time
 
 import numpy as np
 import pygame
-from parameters import Parameters
+from parameters import Parameters as params
 BACKGROUND_COLOR = (255,255,255)
 
 class boid_sprite():
     def __init__(self, x, y, vx, vy, world) -> None:
         self.kinematic_array  = np.array([0, 0, 0, 0])
         self.color = np.random.randint(0, 255, 3)
-        self.size = Parameters.min_seperation/20
+        self.size = params.min_seperation/20
         self.world = world
         
     def draw(self):
@@ -33,8 +33,8 @@ class boid_sprite():
         self.draw()
         
     def convert_coords(self, x, y):
-        x_t = (x/Parameters.DOMAIN)*pygame.display.Info().current_w
-        y_t = (y/Parameters.DOMAIN)*pygame.display.Info().current_h
+        x_t = (x/params.DOMAIN)*pygame.display.Info().current_w
+        y_t = (y/params.DOMAIN)*pygame.display.Info().current_h
         return (x_t, y_t)
 
 
@@ -46,17 +46,17 @@ class Game_Space():
         print(pygame.display.get_desktop_sizes())
         win_size_x = pygame.display.get_desktop_sizes()[0][0]
         win_size_y = pygame.display.get_desktop_sizes()[0][1]
-        if(Parameters.DOMAIN < win_size_x or Parameters.DOMAIN < win_size_y):
-            win_size_x = Parameters.DOMAIN
-            win_size_y = Parameters.DOMAIN
+        if(params.DOMAIN < win_size_x or params.DOMAIN < win_size_y):
+            win_size_x = params.DOMAIN
+            win_size_y = params.DOMAIN
         else:
             win_size_x = int(win_size_x*0.8)
             win_size_y = int(win_size_y*0.8)
 
         self.world = pygame.display.set_mode((win_size_x, win_size_y)) 
-        for i in range(Parameters.NUM_BOIDS):
-            self.boid_list.append(boid_sprite(randint(1,Parameters.DOMAIN),
-                                              randint(1,Parameters.DOMAIN),
+        for i in range(params.NUM_BOIDS):
+            self.boid_list.append(boid_sprite(randint(1,params.DOMAIN),
+                                              randint(1,params.DOMAIN),
                                               0,
                                               0,
                                               self.world))
@@ -66,7 +66,7 @@ class Game_Space():
     # pipe handling and update code
 
     def pipe_init(self):
-        self.pipe = open(Parameters.PIPE, "rb")
+        self.pipe = open(params.PIPE, "rb")
         self.data = queue.Queue()
         self.pipe_reader = threading.Thread(target=self.empty_pipe)
         self.pipe_reader.start()
@@ -103,7 +103,7 @@ class Game_Space():
         while True:
             self.update()
             pygame.display.update() #Update the displaypane
-            time.sleep(Parameters.FPS)
+            time.sleep(params.FPS)
             self.world.fill(BACKGROUND_COLOR) #Clear the displaypane
 
 if __name__== '__main__':

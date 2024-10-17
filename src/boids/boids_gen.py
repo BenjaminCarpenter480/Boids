@@ -1,11 +1,10 @@
 import logging
 import os
 from random import randint, random
-import time
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.linalg import norm
-from parameters import Parameters
+from parameters import Parameters as params
 
 
 class Space():
@@ -14,9 +13,9 @@ class Space():
         self.fig, self.ax = plt.subplots()
         self.boid_list = []
 
-        for _ in range(Parameters.NUM_BOIDS):
-            self.boid_list.append(boid(self.boid_list,randint(1,Parameters.DOMAIN),
-                                        randint(1,Parameters.DOMAIN),
+        for _ in range(params.NUM_BOIDS):
+            self.boid_list.append(boid(self.boid_list,randint(1,params.DOMAIN),
+                                        randint(1,params.DOMAIN),
                                         (random()),
                                         random(),
                                         randint(0,1)))
@@ -24,19 +23,19 @@ class Space():
     def startup(self):
         try:
             try:
-                os.remove(Parameters.PIPE)
+                os.remove(params.PIPE)
             except FileNotFoundError:
                 pass
     
-            os.mkfifo(Parameters.PIPE)
+            os.mkfifo(params.PIPE)
             logging.info("Pipe created")
-            self.pipe = open(Parameters.PIPE, 'wb' )
+            self.pipe = open(params.PIPE, 'wb' )
             self.sim_loop()
         except FileExistsError as e:
             logging.error("Error in simulator: %s", e.strerror)
         finally:
             try:
-                os.remove(Parameters.PIPE)
+                os.remove(params.PIPE)
             except FileNotFoundError:
                 pass
             logging.info("Pipe removed")
@@ -74,17 +73,17 @@ class boid():
         average_pos = np.array([0,0],dtype=float)
         num_neighbours = 0
         for ob in self._boids:
-            if(norm(ob.position - self.position) < Parameters.visual_dist):
+            if(norm(ob.position - self.position) < params.visual_dist):
                 average_vel += ob.velocity
                 average_pos += ob.position
                 num_neighbours += 1
                 
         if(num_neighbours > 0):
             average_vel = average_vel/num_neighbours
-            self.velocity += (average_vel-self.velocity)*Parameters.match_speed_factor
+            self.velocity += (average_vel-self.velocity)*params.match_speed_factor
             
             average_pos = average_pos/num_neighbours
-            self.velocity += (average_pos-self.position)*Parameters.centering_factor
+            self.velocity += (average_pos-self.position)*params.centering_factor
 
 
     def move(self):
@@ -102,14 +101,14 @@ class boid():
 
         self.limit_speed()
 
-        self.position += self.velocity*Parameters.STEP_SIZE
+        self.position += self.velocity*params.STEP_SIZE
 
     def limit_speed(self):
         speed =norm(self.velocity)
-        if speed>Parameters.max_speed:
-            self.velocity = (self.velocity/speed)*Parameters.max_speed
-        elif speed<Parameters.min_speed:
-            self.velocity = (self.velocity/speed)*Parameters.min_speed
+        if speed>params.max_speed:
+            self.velocity = (self.velocity/speed)*params.max_speed
+        elif speed<params.min_speed:
+            self.velocity = (self.velocity/speed)*params.min_speed
 
     def handle_edges(self):
         """
@@ -119,14 +118,14 @@ class boid():
         """
         #TODO: We want turn speed to be a function of the distance from the wall, increasing the 
         # closer we are to the wall (so the boid doesn't hit the wall!)
-        if self.x < Parameters.left_margin:
-            self.vx = self.vx+Parameters.turn_speed 
-        if self.x > Parameters.right_margin:
-            self.vx = self.vx-Parameters.turn_speed
-        if self.y < Parameters.bottom_margin:
-            self.vy = self.vy+Parameters.turn_speed 
-        if self.y > Parameters.top_margin:
-            self.vy = self.vy-Parameters.turn_speed
+        if self.x < params.left_margin:
+            self.vx = self.vx+params.turn_speed 
+        if self.x > params.right_margin:
+            self.vx = self.vx-params.turn_speed
+        if self.y < params.bottom_margin:
+            self.vy = self.vy+params.turn_speed 
+        if self.y > params.top_margin:
+            self.vy = self.vy-params.turn_speed
 
     def move_away(self):
         """
@@ -137,10 +136,10 @@ class boid():
         """
         move_away_vec = np.array([0,0],dtype=float)
         for ob in self._boids:
-            if(norm(ob.position - self.position) < Parameters.min_seperation):
+            if(norm(ob.position - self.position) < params.min_seperation):
                 move_away_vec += self.position - ob.position
 
-        self.velocity += move_away_vec*Parameters.move_away_factor                
+        self.velocity += move_away_vec*params.move_away_factor                
 
 
     #Getters and Setters    
