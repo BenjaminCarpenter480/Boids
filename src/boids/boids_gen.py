@@ -12,6 +12,14 @@ class Space():
         np.random.seed()
         self.fig, self.ax = plt.subplots()
         self.boid_list = []
+        try:
+            os.remove(params.PIPE)
+        except FileNotFoundError:
+            pass
+
+        os.mkfifo(params.PIPE)
+        logging.info("Pipe created")
+        self.pipe = open(params.PIPE, 'wb' )
 
         for _ in range(params.NUM_BOIDS):
             self.boid_list.append(boid(self.boid_list,randint(1,params.DOMAIN),
@@ -22,14 +30,7 @@ class Space():
 
     def startup(self):
         try:
-            try:
-                os.remove(params.PIPE)
-            except FileNotFoundError:
-                pass
 
-            os.mkfifo(params.PIPE)
-            logging.info("Pipe created")
-            self.pipe = open(params.PIPE, 'wb' )
             self.sim_loop()
 
         except FileExistsError as e:
@@ -40,8 +41,8 @@ class Space():
             except FileNotFoundError:
                 pass
             logging.info("Pipe removed")
-    
-    
+
+
     def sim_loop(self):
         #Should probably keep open all loop so not read during write
         while True:
@@ -68,7 +69,7 @@ class boid():
         """
         We work out the average velocity of "neighbouring" boids and then add the difference to the boids velocity with
         some small scaling factor  This acts to get them all moving the same direction
-        """ 
+        """
 
         average_vel = np.array([0,0],dtype=float)
         average_pos = np.array([0,0],dtype=float)
@@ -78,11 +79,11 @@ class boid():
                 average_vel += ob.velocity
                 average_pos += ob.position
                 num_neighbours += 1
-                
+
         if(num_neighbours > 0):
             average_vel = average_vel/num_neighbours
             self.velocity += (average_vel-self.velocity)*params.match_speed_factor
-            
+
             average_pos = average_pos/num_neighbours
             self.velocity += (average_pos-self.position)*params.centering_factor
 
@@ -92,12 +93,12 @@ class boid():
         """
         We work out the average velocity of "neighbouring" boids and then add the difference to the boids velocity with
         some small scaling factor  This acts to get them all moving the same direction
-        """ 
+        """
 
         self.move_together()
 
         self.handle_edges()
-        
+
         self.move_away()
 
         self.limit_speed()
@@ -113,26 +114,26 @@ class boid():
 
     def handle_edges(self):
         """
-        When a boid reaches the edge of space (a wall) we want to modify its 
+        When a boid reaches the edge of space (a wall) we want to modify its
         velocity such that it will start to make a turn from the wall with every
         time step
         """
-        #TODO: We want turn speed to be a function of the distance from the wall, increasing the 
+        #TODO: We want turn speed to be a function of the distance from the wall, increasing the
         # closer we are to the wall (so the boid doesn't hit the wall!)
         if self.x < params.left_margin:
-            self.vx = self.vx+params.turn_speed 
+            self.vx = self.vx+params.turn_speed
         if self.x > params.right_margin:
             self.vx = self.vx-params.turn_speed
         if self.y < params.bottom_margin:
-            self.vy = self.vy+params.turn_speed 
+            self.vy = self.vy+params.turn_speed
         if self.y > params.top_margin:
             self.vy = self.vy-params.turn_speed
 
     def move_away(self):
         """
-            Dealing with getting away from another boid that has gotten too 
-            close, this is done by keeping creating a vector pointing in 
-            opposite direction to any boids "too close" and then adding this to 
+            Dealing with getting away from another boid that has gotten too
+            close, this is done by keeping creating a vector pointing in
+            opposite direction to any boids "too close" and then adding this to
             some overall "move away" vector which is moved in (with some scaling)
         """
         move_away_vec = np.array([0,0],dtype=float)
@@ -140,14 +141,14 @@ class boid():
             if(norm(ob.position - self.position) < params.min_seperation):
                 move_away_vec += self.position - ob.position
 
-        self.velocity += move_away_vec*params.move_away_factor                
+        self.velocity += move_away_vec*params.move_away_factor
 
 
-    #Getters and Setters    
+    #Getters and Setters
     @property
     def position(self):
         return self._position
-    
+
     @position.setter
     def position(self, value):
         self._position = value
@@ -155,10 +156,10 @@ class boid():
     @property
     def velocity(self):
         return self._velocity
-    
+
     @velocity.setter
     def velocity(self, value):
-        self._velocity = value 
+        self._velocity = value
 
     @property
     def x(self):
@@ -171,7 +172,7 @@ class boid():
     @property
     def y(self):
         return self._position[1]
-    
+
     @y.setter
     def y(self, value):
         self._position[1] = value
@@ -179,7 +180,7 @@ class boid():
     @property
     def vx(self):
         return self._velocity[0]
-    
+
     @vx.setter
     def vx(self, value):
         self._velocity[0] = value
@@ -187,7 +188,7 @@ class boid():
     @property
     def vy(self):
         return self._velocity[1]
-    
+
     @vy.setter
     def vy(self, value):
         self._velocity[1] = value

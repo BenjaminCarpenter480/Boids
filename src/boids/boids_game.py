@@ -15,22 +15,22 @@ class BoidSprite():
         self.color = np.random.randint(0, 255, 3)
         self.size = params.min_seperation/20
         self.world = world
-        
+
     def draw(self):
         pygame.draw.circle(self.world,
                            self.color,
                            self.convert_coords(self.kinematic_array[0], self.kinematic_array[1]),
                            self.size)
-    
+
     @property
     def kinematic_vector(self):
-        return self.kinematic_array 
+        return self.kinematic_array
 
     @kinematic_vector.setter
     def kinematic_vector(self, np_array):
         self.kinematic_array = np_array
         self.draw()
-        
+
     def convert_coords(self, x, y):
         x_t = (x/params.DOMAIN)*pygame.display.Info().current_w
         y_t = (y/params.DOMAIN)*pygame.display.Info().current_h
@@ -59,7 +59,7 @@ class PipeReadHandler():
         """
         while self.__pipe.readable():
             self.__data.put(self.__pipe.readline())
-        
+
     def get_data(self):
         """Data stored in the pipe
         """
@@ -81,29 +81,28 @@ class GameVisuliser():
             win_size_x = int(win_size_x*0.8)
             win_size_y = int(win_size_y*0.8)
 
-        self.world = pygame.display.set_mode((win_size_x, win_size_y)) 
+        self.world = pygame.display.set_mode((win_size_x, win_size_y))
         for _ in range(params.NUM_BOIDS):
             self.boid_list.append(BoidSprite(randint(1,params.DOMAIN),
                                               randint(1,params.DOMAIN),
                                               0,
                                               0,
                                               self.world))
-        
+
         self.pipe_access = PipeReadHandler(params.PIPE)
-        self.logger = logging.getLogger(__name__)        
+        self.logger = logging.getLogger(__name__)
 
     def update_boids(self):
-        # while self.data.qsize() == 0: 
-        # TODO Convert to using ASYNC in place of threads and wait here?  
-            
-        
+        # while self.data.qsize() == 0:
+        # TODO Convert to using ASYNC in place of threads and wait here?
+
+
         data = self.pipe_access.get_data()
         boids_from_pipe = data.split(';')
-        
+
         self.logger.debug("Displaying %d boids", len(boids_from_pipe))
         for i in range(len(boids_from_pipe)-1):
             self.boid_list[i].kinematic_vector=np.array(boids_from_pipe[i].split(','),dtype=float)
-
 
     def update(self):
         self.update_boids()
@@ -112,7 +111,7 @@ class GameVisuliser():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-    
+
     def loop(self):
         while True:
             self.update()
