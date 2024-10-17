@@ -18,7 +18,7 @@ def boids_sim():
     Run the boids simulation with the default parameters and visulization
     """
     logger = setup_logging()
-    # typer.echo("Running boids")
+    logging.info("Starting boids simulation")
     space = bg.Space()
 
     generator_proc = multiprocessing.Process(target=space.startup)
@@ -26,7 +26,7 @@ def boids_sim():
     time.sleep(2)
 
     logger.info("Starting visulization")
-    visulisation = bv.Game_Space()
+    visulisation = bv.GameVisuliser()
 
     try:
         visulisation.loop()

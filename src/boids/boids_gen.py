@@ -26,11 +26,12 @@ class Space():
                 os.remove(params.PIPE)
             except FileNotFoundError:
                 pass
-    
+
             os.mkfifo(params.PIPE)
             logging.info("Pipe created")
             self.pipe = open(params.PIPE, 'wb' )
             self.sim_loop()
+
         except FileExistsError as e:
             logging.error("Error in simulator: %s", e.strerror)
         finally:

@@ -9,7 +9,7 @@ import pygame
 from parameters import Parameters as params
 BACKGROUND_COLOR = (255,255,255)
 
-class boid_sprite():
+class BoidSprite():
     def __init__(self, x, y, vx, vy, world) -> None:
         self.kinematic_array  = np.array([0, 0, 0, 0])
         self.color = np.random.randint(0, 255, 3)
@@ -26,7 +26,6 @@ class boid_sprite():
     def kinematic_vector(self):
         return self.kinematic_array 
 
-
     @kinematic_vector.setter
     def kinematic_vector(self, np_array):
         self.kinematic_array = np_array
@@ -38,7 +37,36 @@ class boid_sprite():
         return (x_t, y_t)
 
 
-class Game_Space():
+class PipeReadHandler():
+    """
+    For reading data from the generator object
+
+    Data is returned as a string with each boid seperated by a ';' and each "," seperating the boid
+    attributes in the form x,y,vx,vy
+    """
+
+    def __init__(self, pipe_address=params.PIPE) -> None:
+        """Class to handle reading from the pipe
+        """
+        self.__pipe = open(pipe_address,"rb")
+        self.__data = queue.Queue()
+        self.__pipe_reader = threading.Thread(target=self.empty_pipe)
+        self.__pipe_reader.start()
+
+    def empty_pipe(self):
+        """
+        Read from the pipe and put the data in the queue to be accessed by the process
+        """
+        while self.__pipe.readable():
+            self.__data.put(self.__pipe.readline())
+        
+    def get_data(self):
+        """Data stored in the pipe
+        """
+        return self.__data.get().decode('ASCII')
+
+
+class GameVisuliser():
     boid_list = []
     def __init__(self) -> None:
         pygame.init()
@@ -54,36 +82,22 @@ class Game_Space():
             win_size_y = int(win_size_y*0.8)
 
         self.world = pygame.display.set_mode((win_size_x, win_size_y)) 
-        for i in range(params.NUM_BOIDS):
-            self.boid_list.append(boid_sprite(randint(1,params.DOMAIN),
+        for _ in range(params.NUM_BOIDS):
+            self.boid_list.append(BoidSprite(randint(1,params.DOMAIN),
                                               randint(1,params.DOMAIN),
                                               0,
                                               0,
                                               self.world))
-        self.pipe_init()
-        self.logger = logging.getLogger(__name__)
-
-    # pipe handling and update code
-
-    def pipe_init(self):
-        self.pipe = open(params.PIPE, "rb")
-        self.data = queue.Queue()
-        self.pipe_reader = threading.Thread(target=self.empty_pipe)
-        self.pipe_reader.start()
-
-
-    def empty_pipe(self):
-        # count = 0
-        while self.pipe.readable():
-            self.data.put(self.pipe.readline())
         
+        self.pipe_access = PipeReadHandler(params.PIPE)
+        self.logger = logging.getLogger(__name__)        
 
     def update_boids(self):
         # while self.data.qsize() == 0: 
         # TODO Convert to using ASYNC in place of threads and wait here?  
             
         
-        data = self.data.get().decode('ASCII')
+        data = self.pipe_access.get_data()
         boids_from_pipe = data.split(';')
         
         self.logger.debug("Displaying %d boids", len(boids_from_pipe))
@@ -107,5 +121,5 @@ class Game_Space():
             self.world.fill(BACKGROUND_COLOR) #Clear the displaypane
 
 if __name__== '__main__':
-    game = Game_Space()
+    game = GameVisuliser()
     game.loop()
