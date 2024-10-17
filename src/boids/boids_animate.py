@@ -2,6 +2,7 @@ import logging
 
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import numpy as np
 from parameters import Parameters as params
 from boids_game import PipeReadHandler
 
@@ -9,7 +10,10 @@ class BoidVisualiser():
     def __init__(self) -> None:
         plt.close('all')
         self.fig, self.ax = plt.subplots()
-        self.boid_scatter = self.ax.scatter([], [], s=params.min_seperation/20)
+        self.boid_scatter = self.ax.scatter(np.zeros(params.NUM_BOIDS),
+                                            np.zeros(params.NUM_BOIDS),
+                                            s=params.min_seperation/20, 
+                                            c=np.random.randint(0, 255, params.NUM_BOIDS))
         self.ax.set_xlim(0, params.DOMAIN)
         self.ax.set_ylim(0, params.DOMAIN)
         self.ax.tick_params(left = False, right = False , labelleft = False , 
