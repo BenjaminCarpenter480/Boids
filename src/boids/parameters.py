@@ -1,6 +1,6 @@
 class Parameters:
     FPS = 1/60
-    PIPE = "/tmp/boids"
+    PIPE = "/tmp/boids_pipe"
     DOMAIN = 5000
     NUM_BOIDS = 40
     STEP_SIZE=1

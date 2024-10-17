@@ -12,14 +12,17 @@ class Space():
         np.random.seed()
         self.fig, self.ax = plt.subplots()
         self.boid_list = []
-        try:
-            os.remove(params.PIPE)
-        except FileNotFoundError:
-            pass
 
-        os.mkfifo(params.PIPE)
-        logging.info("Pipe created")
-        self.pipe = open(params.PIPE, 'wb' )
+        try:
+           os.remove(params.PIPE)
+        except FileNotFoundError:
+           pass
+        try:
+            os.mkfifo(params.PIPE)
+            logging.info("Pipe created")
+        except FileNotFoundError as e:
+            logging.error("Error creating pipe: %s", e.strerror)
+            raise e
 
         for _ in range(params.NUM_BOIDS):
             self.boid_list.append(boid(self.boid_list,randint(1,params.DOMAIN),
@@ -28,13 +31,14 @@ class Space():
                                         random(),
                                         randint(0,1)))
 
-    def startup(self):
+    def run_loop(self):
         try:
-
+            self.pipe = open(params.PIPE, 'wb')
+            logging.info("Pipe loaded on write side")
             self.sim_loop()
-
         except FileExistsError as e:
             logging.error("Error in simulator: %s", e.strerror)
+            self.pipe.close()
         finally:
             try:
                 os.remove(params.PIPE)
@@ -45,6 +49,7 @@ class Space():
 
     def sim_loop(self):
         #Should probably keep open all loop so not read during write
+        
         while True:
             for b in self.boid_list:
                 b.move()
@@ -70,7 +75,6 @@ class boid():
         We work out the average velocity of "neighbouring" boids and then add the difference to the boids velocity with
         some small scaling factor  This acts to get them all moving the same direction
         """
-
         average_vel = np.array([0,0],dtype=float)
         average_pos = np.array([0,0],dtype=float)
         num_neighbours = 0
@@ -89,7 +93,6 @@ class boid():
 
 
     def move(self):
-        #Move together
         """
         We work out the average velocity of "neighbouring" boids and then add the difference to the boids velocity with
         some small scaling factor  This acts to get them all moving the same direction
@@ -195,5 +198,5 @@ class boid():
 
 if __name__ == "__main__":
     space = Space()
-    space.startup()
+    space.run_loop()
 
