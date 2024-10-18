@@ -23,6 +23,10 @@ def run_with_pygame():
 def run_with_matplotlib():
     boids_sim("matplotlib")
 
+def run_animation():
+    # global visulisation
+    visulisation =  bv.BoidVisualiser()
+    visulisation.animate()
 
 def boids_sim(visualiser: str = "pygame"):
     """
@@ -43,9 +47,19 @@ def boids_sim(visualiser: str = "pygame"):
             visulisation = ba.GameVisuliser()
             visulisation.loop()
         else:
-            visulisation =  bv.BoidVisualiser()
-            visulisation.animate()
-
+            visulisation_proc = multiprocessing.Process(target=run_animation)
+            visulisation_proc.start()
+            while ((vis_alive := visulisation_proc.is_alive())
+                    and (gen_alive := generator_proc.is_alive())):
+                time.sleep(0.1)
+            if (not vis_alive):
+                logger.info("Visulization proc ended")
+                generator_proc.terminate()
+                generator_proc.join()
+            if (not gen_alive):
+                logger.info("Generator proc ended")
+                visulisation_proc.terminate()
+                visulisation_proc.join()
     except KeyboardInterrupt:
         generator_proc.terminate()
         generator_proc.join()

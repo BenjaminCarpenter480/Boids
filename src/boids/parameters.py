@@ -2,7 +2,7 @@ class Parameters:
     FPS = 1/60
     PIPE = "/tmp/boids_pipe"
     DOMAIN = 5000
-    NUM_BOIDS = 40
+    NUM_BOIDS = 100
     STEP_SIZE=1
 
     turn_speed = 1
@@ -17,7 +17,7 @@ class Parameters:
     visual_dist = 0.1*DOMAIN
     match_speed_factor = 0.1
 
-    centering_factor = 0.001
+    centering_factor = 0.01
 
     max_speed = 25
     min_speed = 1
