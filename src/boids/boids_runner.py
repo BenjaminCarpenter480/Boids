@@ -24,7 +24,6 @@ def run_with_matplotlib():
     boids_sim("matplotlib")
 
 def run_animation():
-    # global visulisation
     visulisation =  bv.BoidVisualiser()
     visulisation.animate()
 
