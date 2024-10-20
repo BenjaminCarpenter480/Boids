@@ -1,6 +1,7 @@
 import logging
 import os
 from random import randint, random
+from ssl import VERIFY_ALLOW_PROXY_CERTS
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.linalg import norm
@@ -70,11 +71,26 @@ class boid():
         pipe.write(bytes(f'{self.x},{self.y},{self.vx},{self.vy};', 'ASCII'))
 
 
+
+
+    def move(self):
+        """
+        We work out the average velocity of "neighbouring" boids and then add the difference to the boids velocity with
+        some small scaling factor  This acts to get them all moving the same direction
+        """
+
+        self.velocity = self.velocity+ self.move_together()+self.handle_edges()+self.move_away()
+
+        self.limit_speed()
+
+        self.position += self.velocity*params.STEP_SIZE
+
     def move_together(self):
         """
         We work out the average velocity of "neighbouring" boids and then add the difference to the boids velocity with
         some small scaling factor  This acts to get them all moving the same direction
         """
+        velocity_change = np.array([0,0],dtype=float)
         average_vel = np.array([0,0],dtype=float)
         average_pos = np.array([0,0],dtype=float)
         num_neighbours = 0
@@ -86,29 +102,22 @@ class boid():
 
         if(num_neighbours > 0):
             average_vel = average_vel/num_neighbours
-            self.velocity += (average_vel-self.velocity)*params.match_speed_factor
+            velocity_change += (average_vel-self.velocity)*params.match_speed_factor
 
             average_pos = average_pos/num_neighbours
-            self.velocity += (average_pos-self.position)*params.centering_factor
+            velocity_change += (average_pos-self.position)*params.centering_factor
 
+        return velocity_change
 
-    def move(self):
-        """
-        We work out the average velocity of "neighbouring" boids and then add the difference to the boids velocity with
-        some small scaling factor  This acts to get them all moving the same direction
-        """
-
-        self.move_together()
-
-        self.handle_edges()
-
-        self.move_away()
-
-        self.limit_speed()
-
-        self.position += self.velocity*params.STEP_SIZE
 
     def limit_speed(self):
+        """
+        Prevent boids from moving too fast or too slow, simply by normalising the velocity vector  
+        for correct direction and then multiplying by the max or min speed if the speed is too high
+        or low
+
+        Needs to really use the current speef of the boid not the previous step speed.
+        """
         speed =norm(self.velocity)
         if speed>params.max_speed:
             self.velocity = (self.velocity/speed)*params.max_speed
@@ -121,16 +130,20 @@ class boid():
         velocity such that it will start to make a turn from the wall with every
         time step
         """
+        diff_vx = 0
+        diff_vy = 0
         #TODO: We want turn speed to be a function of the distance from the wall, increasing the
         # closer we are to the wall (so the boid doesn't hit the wall!)
         if self.x < params.left_margin:
-            self.vx = self.vx+params.turn_speed
+            diff_vx = params.turn_speed
         if self.x > params.right_margin:
-            self.vx = self.vx-params.turn_speed
+            diff_vx = -params.turn_speed
         if self.y < params.bottom_margin:
-            self.vy = self.vy+params.turn_speed
+            diff_vy = params.turn_speed
         if self.y > params.top_margin:
-            self.vy = self.vy-params.turn_speed
+            diff_vy  = -params.turn_speed
+
+        return np.array([diff_vx,diff_vy],dtype=float)
 
     def move_away(self):
         """
@@ -144,7 +157,7 @@ class boid():
             if(norm(ob.position - self.position) < params.min_seperation):
                 move_away_vec += self.position - ob.position
 
-        self.velocity += move_away_vec*params.move_away_factor
+        return move_away_vec*params.move_away_factor
 
 
     #Getters and Setters
