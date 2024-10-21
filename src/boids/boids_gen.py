@@ -1,7 +1,6 @@
 import logging
 import os
 from random import randint, random
-from ssl import VERIFY_ALLOW_PROXY_CERTS
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.linalg import norm
@@ -54,9 +53,8 @@ class Space():
         while True:
             for b in self.boid_list:
                 b.move()
-                # print("Waiting on write")
+
                 b.write(self.pipe)
-                # print("Written")
             self.pipe.write(bytes("\n",encoding='ASCII'))
 
 
@@ -65,50 +63,59 @@ class boid():
         self._position = np.array([x,y],dtype=float)
         self._velocity = np.array([vx,vy],dtype=float)
         self._boids = boids
-        self.bias = bias
+        self.bias = NotImplemented
 
     def write(self,pipe):
         pipe.write(bytes(f'{self.x},{self.y},{self.vx},{self.vy};', 'ASCII'))
-
-
-
 
     def move(self):
         """
         We work out the average velocity of "neighbouring" boids and then add the difference to the boids velocity with
         some small scaling factor  This acts to get them all moving the same direction
         """
-
-        self.velocity = self.velocity+ self.move_together()+self.handle_edges()+self.move_away()
+ 
+        nearest_neighbours, colliding_neighbours, local_average_pos, local_average_vel = self.nearest_neighbour_props()
+        num_nearest_neighbours = len(nearest_neighbours)
+        self.velocity = (self.velocity
+                         +self.move_together(num_nearest_neighbours, local_average_pos, local_average_vel)
+                         +self.handle_edges()
+                         +self.move_away()
+                        )
 
         self.limit_speed()
 
         self.position += self.velocity*params.STEP_SIZE
 
-    def move_together(self):
+    def move_together(self, num_near_neighbours, local_average_pos, local_average_vel):
         """
         We work out the average velocity of "neighbouring" boids and then add the difference to the boids velocity with
         some small scaling factor  This acts to get them all moving the same direction
         """
         velocity_change = np.array([0,0],dtype=float)
-        average_vel = np.array([0,0],dtype=float)
-        average_pos = np.array([0,0],dtype=float)
-        num_neighbours = 0
-        for ob in self._boids:
-            if(norm(ob.position - self.position) < params.visual_dist):
-                average_vel += ob.velocity
-                average_pos += ob.position
-                num_neighbours += 1
+        if(num_near_neighbours > 0):
+            local_average_vel = local_average_vel/num_near_neighbours
+            velocity_change += (local_average_vel-self.velocity)*params.match_speed_factor
 
-        if(num_neighbours > 0):
-            average_vel = average_vel/num_neighbours
-            velocity_change += (average_vel-self.velocity)*params.match_speed_factor
-
-            average_pos = average_pos/num_neighbours
-            velocity_change += (average_pos-self.position)*params.centering_factor
+            local_average_pos = local_average_pos/num_near_neighbours
+            velocity_change += (local_average_pos-self.position)*params.centering_factor
 
         return velocity_change
 
+    def nearest_neighbour_props(self):
+        local_average_vel = np.array([0,0],dtype=float)
+        local_average_pos = np.array([0,0],dtype=float)
+        nearest_neighbours:set = set()
+        colliding_neighbours:set = set()
+        for ob in self._boids:
+            if(calc_norm := norm(ob.position - self.position) < params.visual_dist):
+                local_average_vel += ob.velocity
+                local_average_pos += ob.position
+                nearest_neighbours.add(ob)
+                if(calc_norm < 2*params.min_seperation):
+                    colliding_neighbours.add(ob)                
+
+        
+        return nearest_neighbours, colliding_neighbours, local_average_pos,local_average_vel
 
     def limit_speed(self):
         """
