@@ -6,9 +6,6 @@ from typing import BinaryIO
 from base_boids import BaseBoid, BaseSpace, BoidState, CommunicationStrategy
 from parameters import Parameters as params
 
-import debugpy
-debugpy.debug_this_thread()
-
 
 class PipeCommunication(CommunicationStrategy):
     """Pipe-based communication strategy"""
