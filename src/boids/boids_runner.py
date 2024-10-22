@@ -10,7 +10,7 @@ import boids_animate as bv
 boids_app = typer.Typer(name="boids", add_completion=False)
 
 def setup_logging():
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
     return logging.getLogger(__name__)
 
 

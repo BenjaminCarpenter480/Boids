@@ -11,12 +11,15 @@ class Parameters:
     bottom_margin = 0.2*DOMAIN
     top_margin = 0.8*DOMAIN
 
-    min_seperation = 0.05*DOMAIN
-    move_away_factor = 0.01
+    # Size of a boid, if they get within 2* this distance to another boid they are considered collided
+    
+    move_away_factor = 1
 
-    visual_dist = 0.1*DOMAIN
-    match_speed_factor = 0.1
-
+    visual_dist    = 500 # Distance a boid can see, they'll try to match speed and move towards the average position of boids in this range
+    avoid_dist     = 400 # Distance at which boids will act to move apart
+    min_seperation = 50  # Size of a boid, if they get within 2* this distance to another boid they are considered collided
+    
+    match_speed_factor = 1
     centering_factor = 0.005
 
     max_speed = 25
