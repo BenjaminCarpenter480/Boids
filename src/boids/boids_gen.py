@@ -81,10 +81,11 @@ class boid():
                           num_nearest_neighbours,len(nearest_avoiding_neighbours), len(colliding_neighbours))
         self.velocity = (self.velocity
                          +self.move_together(num_nearest_neighbours, local_average_pos, local_average_vel)
-                         +self.handle_edges()
-                         +self.move_away(nearest_avoiding_neighbours,colliding_neighbours)
+                         +self.move_away(nearest_avoiding_neighbours)
                         )
 
+        self.handle_interboid_collisions(colliding_neighbours)
+        self.handle_edges()
         self.limit_speed()
 
         self.position += self.velocity*params.STEP_SIZE
@@ -130,20 +131,16 @@ class boid():
         self.logger.debug("Velocity change due to moving together: %s", velocity_change)
         return velocity_change
 
-    def move_away(self, nearest_avoiding_neighbours ,colliding_neighbours):
+    def move_away(self, nearest_avoiding_neighbours):
         """
             Dealing with getting away from another boid that has gotten too
             close, this is done by keeping creating a vector pointing in
             opposite direction to any boids "too close" and then adding this to
             some overall "move away" vector which is moved in (with some scaling)
-        """
-        diff_velocity_collide = np.array([0,0],dtype=float)
-        for ob in colliding_neighbours:
-            diff_velocity_collide  += ((self.mass-ob.mass)*self.velocity+2*ob.mass*ob.velocity)/(self.mass+ob.mass)
 
-        self.logger.debug("Velocity change due to collisions away: %s", diff_velocity_collide)
-
-        
+            We also handle collisions with the 'wall' here, by considering the wall as a form of 
+            elastic collision
+        """ 
         diff_velocity_avoid = np.array([0,0],dtype=float)
 
         for ob in nearest_avoiding_neighbours:
@@ -151,7 +148,7 @@ class boid():
 
         self.logger.debug("Velocity change due to avoidance away: %s", diff_velocity_avoid)
 
-        return diff_velocity_collide + diff_velocity_avoid
+        return  diff_velocity_avoid
 
     def limit_speed(self):
         """
@@ -167,29 +164,25 @@ class boid():
         elif speed<params.min_speed:
             self.velocity = (self.velocity/speed)*params.min_speed
 
+    def handle_interboid_collisions(self, colliding_neighbours):
+        for ob in colliding_neighbours:
+            self.velocity = ((self.mass-ob.mass)*self.velocity+2*ob.mass*ob.velocity)/(self.mass+ob.mass)
+
+
     def handle_edges(self):
         """
         When a boid reaches the edge of space (a wall) we want to modify its
         velocity such that it will start to make a turn from the wall with every
         time step
         """
-        diff_vx = 0
-        diff_vy = 0
-        #TODO: We want turn speed to be a function of the distance from the wall, increasing the
-        # closer we are to the wall (so the boid doesn't hit the wall!)
         if self.x < params.left_margin:
-            diff_vx = params.turn_speed
+            self.velocity[0] =  abs(self.velocity[0])
         if self.x > params.right_margin:
-            diff_vx = -params.turn_speed
-        if self.y < params.bottom_margin:
-            diff_vy = params.turn_speed
-        if self.y > params.top_margin:
-            diff_vy  = -params.turn_speed
-
-        self.logger.debug("Velocity change due to edge: %s", [diff_vx,diff_vy])
-        return np.array([diff_vx,diff_vy],dtype=float)
-
-
+            self.velocity[0] = -abs(self.velocity[0])
+        if self.y > params.bottom_margin:
+            self.velocity[1] = -abs(self.velocity[1])
+        if self.y < params.top_margin:
+            self.velocity[1] = abs(self.velocity[1])
 
     #Getters and Setters
     @property

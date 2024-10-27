@@ -1,4 +1,5 @@
 import logging
+import sys
 
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -14,10 +15,14 @@ class BoidVisualiser():
                                             np.zeros(params.NUM_BOIDS),
                                             s=params.min_seperation/20, 
                                             c=np.random.randint(0, 255, params.NUM_BOIDS))
-        self.ax.set_xlim(0, params.DOMAIN)
-        self.ax.set_ylim(0, params.DOMAIN)
+        self.ax.set_xlim(-params.DOMAIN*0.2, params.DOMAIN*1.2)
+        self.ax.set_ylim(-params.DOMAIN*0.2, params.DOMAIN*1.2)
+        self.ax.scatter(0,0)
+        self.ax.scatter(0,params.DOMAIN)
+        self.ax.scatter(params.DOMAIN, params.DOMAIN)
+        self.ax.scatter(params.DOMAIN, 0)
         self.ax.tick_params(left = False, right = False , labelleft = False , 
-                labelbottom = False, bottom = False) 
+                labelbottom = False, bottom = False)
         self.pipe_access = PipeReadHandler(params.PIPE)
         self.logger = logging.getLogger(__name__)
 
@@ -43,6 +48,7 @@ class BoidVisualiser():
                                        frames=1000
                                        )
         plt.show()
+        sys.exit()
 
 
 if __name__ == '__main__':
