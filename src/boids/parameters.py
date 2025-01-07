@@ -17,7 +17,7 @@ class Parameters:
     visual_dist = 0.1*DOMAIN
     match_speed_factor = 0.1
 
-    centering_factor = 0.005
+    centering_factor = 0.001
 
     max_speed = 25
     min_speed = 1
