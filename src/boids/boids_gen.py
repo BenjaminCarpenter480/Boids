@@ -1,3 +1,7 @@
+"""
+This file defines the boid class which define each boids kinematics and space class which defines 
+the time and space the boids move in.
+"""
 import logging
 import os
 from random import randint, random
@@ -9,14 +13,18 @@ from parameters import Parameters as params
 
 class Space():
     def __init__(self) -> None:
+        """
+        Class to define the space in which boids move, includes the boids update loop
+        """
         np.random.seed()
         self.fig, self.ax = plt.subplots()
         self.boid_list = []
+        self.pipe = None
 
         try:
-           os.remove(params.PIPE)
+            os.remove(params.PIPE)
         except FileNotFoundError:
-           pass
+            pass
         try:
             os.mkfifo(params.PIPE)
             logging.info("Pipe created")
@@ -32,6 +40,12 @@ class Space():
                                         randint(0,1)))
 
     def run_loop(self):
+        """
+        Startup loop to generate simulation data related to boid positions which
+        is written to a pipe defined in the parameters file
+
+        Includes handling of the pipe creation and deletion
+        """
         try:
             self.pipe = open(params.PIPE, 'wb')
             logging.info("Pipe loaded on write side")
@@ -48,8 +62,9 @@ class Space():
 
 
     def sim_loop(self):
-        #Should probably keep open all loop so not read during write
-
+        """
+        Simulation loop to move boids and write their positions to the pipe
+        """
         while True:
             for b in self.boid_list:
                 b.move()
@@ -57,10 +72,18 @@ class Space():
                 b.write(self.pipe)
             self.pipe.write(bytes("\n",encoding='ASCII'))
 
-
 class boid():
-    def __init__(self,boids, x, y, vx, vy,bias=False) -> None:
-        self.logger = logging.getLogger(__name__)
+    def __init__(self,boids, x, y, vx, vy, bias=False) -> None:
+        """
+        Class defining a boid object with a position and velocity
+
+        Args:
+            x (float): x position
+            y (float): y position
+            vx (float): x velocity
+            vy (float): y velocity
+            bias: Not implemented feature
+        """
         self._position = np.array([x,y],dtype=float)
         self._velocity = np.array([vx,vy],dtype=float)
         self._boids = boids
@@ -68,12 +91,16 @@ class boid():
         self.mass = 0.25
 
     def write(self,pipe):
+        """
+        Write the boid position and velocity to the pipe
+        """
         pipe.write(bytes(f'{self.x},{self.y},{self.vx},{self.vy};', 'ASCII'))
 
     def move(self):
         """
-        We work out the average velocity of "neighbouring" boids and then add the difference to the boids velocity with
-        some small scaling factor  This acts to get them all moving the same direction
+        We work out the average velocity of "neighbouring" boids and then add the difference to the 
+        boids velocity with some small scaling factor  This acts to get them all moving the same
+        direction
         """
         nearest_visual_neighbours, nearest_avoiding_neighbours, colliding_neighbours, local_average_pos, local_average_vel = self.nearest_neighbour_props()
         num_nearest_neighbours = len(nearest_visual_neighbours)
@@ -118,11 +145,12 @@ class boid():
 
     def move_together(self, num_near_neighbours, local_average_pos, local_average_vel):
         """
-        We work out the average velocity of "neighbouring" boids and then add the difference to the boids velocity with
-        some small scaling factor  This acts to get them all moving the same direction
+        We work out the average velocity of "neighbouring" boids and then add the difference to the
+        boids velocity with some small scaling factor  
+        This acts to get them all moving the same direction
         """
         velocity_change = np.array([0,0],dtype=float)
-        if(num_near_neighbours > 0):
+        if num_near_neighbours > 0:
             local_average_vel = local_average_vel/num_near_neighbours
             velocity_change += (local_average_vel-self.velocity)*params.match_speed_factor
 
@@ -186,54 +214,53 @@ class boid():
 
     #Getters and Setters
     @property
-    def position(self):
+    def position(self):#pylint: disable=missing-function-docstring # self documenting
         return self._position
 
     @position.setter
-    def position(self, value):
+    def position(self, value):#pylint: disable=missing-function-docstring # self documenting
         self._position = value
 
     @property
-    def velocity(self):
+    def velocity(self):#pylint: disable=missing-function-docstring # self documenting
         return self._velocity
 
     @velocity.setter
-    def velocity(self, value):
+    def velocity(self, value):#pylint: disable=missing-function-docstring # self documenting
         self._velocity = value
 
     @property
-    def x(self):
+    def x(self):#pylint: disable=missing-function-docstring # self documenting
         return self._position[0]
 
     @x.setter
-    def x(self, value):
+    def x(self, value):#pylint: disable=missing-function-docstring # self documenting
         self._position[0] = value
 
     @property
-    def y(self):
+    def y(self):#pylint: disable=missing-function-docstring # self documenting
         return self._position[1]
 
     @y.setter
-    def y(self, value):
+    def y(self, value):#pylint: disable=missing-function-docstring # self documenting
         self._position[1] = value
 
     @property
-    def vx(self):
+    def vx(self):#pylint: disable=missing-function-docstring # self documenting
         return self._velocity[0]
 
     @vx.setter
-    def vx(self, value):
+    def vx(self, value):#pylint: disable=missing-function-docstring # self documenting
         self._velocity[0] = value
 
     @property
-    def vy(self):
+    def vy(self):#pylint: disable=missing-function-docstring # self documenting
         return self._velocity[1]
 
     @vy.setter
-    def vy(self, value):
+    def vy(self, value):#pylint: disable=missing-function-docstring # self documenting
         self._velocity[1] = value
 
 if __name__ == "__main__":
     space = Space()
     space.run_loop()
-
