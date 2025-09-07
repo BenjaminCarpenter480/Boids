@@ -5,39 +5,59 @@ the time and space the boids move in.
 import logging
 import os
 from random import randint, random
-import matplotlib.pyplot as plt
+from typing import List
 import numpy as np
 from numpy.linalg import norm
 from parameters import Parameters as params
 
 
-class Space():
+class Space:
     def __init__(self) -> None:
-        """
-        Class to define the space in which boids move, includes the boids update loop
-        """
+        """Initialize the space containing boids"""
         np.random.seed()
-        self.fig, self.ax = plt.subplots()
-        self.boid_list = []
+        self.boid_list: List[Boid] = []
         self.pipe = None
+        self._setup_pipe()
+        self._initialize_boids()
 
+    def _setup_pipe(self) -> None:
+        """Setup the communication pipe"""
         try:
             os.remove(params.PIPE)
         except FileNotFoundError:
             pass
+        
         try:
             os.mkfifo(params.PIPE)
             logging.info("Pipe created")
-        except FileNotFoundError as e:
-            logging.error("Error creating pipe: %s", e.strerror)
-            raise e
+        except OSError as e:
+            logging.error("Error creating pipe: %s", str(e))
+            raise
 
-        for _ in range(params.NUM_BOIDS):
-            self.boid_list.append(boid(self.boid_list,randint(1,params.DOMAIN),
-                                        randint(1,params.DOMAIN),
-                                        (random()),
-                                        random(),
-                                        randint(0,1)))
+    def _initialize_boids(self) -> None:
+        """Initialize boid population"""
+        # First, create boids with a temporary empty list
+        self.boid_list = [
+            Boid(
+                [],
+                randint(1, params.DOMAIN),
+                randint(1, params.DOMAIN),
+                random(),
+                random()
+            ) for _ in range(params.NUM_BOIDS)
+        ]
+        # Now update each boid's _boids reference to the full list
+        for boid in self.boid_list:
+            boid._boids = self.boid_list
+
+    def __del__(self) -> None:
+        """Cleanup resources"""
+        if self.pipe:
+            self.pipe.close()
+        try:
+            os.remove(params.PIPE)
+        except FileNotFoundError:
+            pass
 
     def run_loop(self):
         """
@@ -72,22 +92,20 @@ class Space():
                 b.write(self.pipe)
             self.pipe.write(bytes("\n",encoding='ASCII'))
 
-class boid():
-    def __init__(self,boids, x, y, vx, vy, bias=False) -> None:
+class Boid:
+    def __init__(self, boids: List['Boid'], x: float, y: float, 
+                 vx: float, vy: float) -> None:
         """
-        Class defining a boid object with a position and velocity
-
+        Initialize a boid with position and velocity
+        
         Args:
-            x (float): x position
-            y (float): y position
-            vx (float): x velocity
-            vy (float): y velocity
-            bias: Not implemented feature
+            boids: List of all boids in the simulation
+            x, y: Initial position
+            vx, vy: Initial velocity
         """
-        self._position = np.array([x,y],dtype=float)
-        self._velocity = np.array([vx,vy],dtype=float)
+        self._position = np.array([x, y], dtype=float)
+        self._velocity = np.array([vx, vy], dtype=float)
         self._boids = boids
-        self.bias = NotImplemented
 
     def write(self,pipe):
         """
@@ -149,7 +167,7 @@ class boid():
                     colliding_neighbours.add(ob)
 
 
-        return nearest_neighbours, colliding_neighbours, local_average_pos,local_average_vel
+        return nearest_neighbours, colliding_neighbours, local_average_pos, local_average_vel
 
     def limit_speed(self):
         """
