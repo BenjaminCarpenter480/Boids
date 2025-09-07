@@ -1,9 +1,11 @@
 from typing import Literal
+from typing import Literal
 import time
 import multiprocessing
 import multiproc_logging
 import typer
 
+from pipe_boids import PipeSpace, PipeCommunication
 from pipe_boids import PipeSpace, PipeCommunication
 import boids_game as ba
 import boids_animate as bv
