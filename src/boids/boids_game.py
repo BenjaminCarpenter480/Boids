@@ -70,6 +70,8 @@ class BoidSprite():
 class GameVisuliser():
     boid_list = []
     def __init__(self) -> None:
+        self.logger = logging.getLogger("boids.visualiser")
+        # Do not set level or add handlers here; handled by multiproc_logging
         pygame.init()
 
         print(pygame.display.get_desktop_sizes())
@@ -91,7 +93,8 @@ class GameVisuliser():
                                               self.world))
 
         self.pipe_access = PipeReadHandler(params.PIPE)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger("boids.visualiser")
+        # Do not set level or add handlers here; handled by multiproc_logging
 
     def update_boids(self):
         # while self.data.qsize() == 0:
