@@ -3,7 +3,8 @@ from dataclasses import dataclass
 import numpy as np
 from parameters import Parameters as params
 from numpy.linalg import norm
-from typing import List
+from typing import List, Optional
+import logging
 
 @dataclass
 class BoidState:
@@ -25,6 +26,7 @@ class BaseBoid(ABC):
         self._position = np.array([x, y], dtype=float)
         self._velocity = np.array([vx, vy], dtype=float)
         self._boids = boids
+        self.logger = logging.getLogger("boids.boid")
 
 
     def move(self):
@@ -46,6 +48,9 @@ class BaseBoid(ABC):
         self.limit_speed()
 
         self.position += self.velocity*params.STEP_SIZE
+        self.logger.debug("Boid at (%.2f, %.2f) with velocity (%.2f, %.2f) has %d neighbours and %d colliding",
+                          self.x, self.y, self.vx, self.vy,
+                          num_nearest_neighbours, len(colliding_neighbours))
 
     def move_together(self, num_near_neighbours, local_average_pos, local_average_vel):
         """
@@ -191,6 +196,8 @@ class BaseBoid(ABC):
 class BaseSpace(ABC):
     """Base class for all space implementations"""
     def __init__(self, comm_strategy: CommunicationStrategy) -> None:
+        self.logger = logging.getLogger("boids.space")
+        # Do not set level or add handlers here; handled by multiproc_logging
         self.boid_list: List[BaseBoid] = []
         self.comm = comm_strategy
         self._initialize_boids()

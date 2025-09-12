@@ -1,13 +1,12 @@
 from typing import Literal
 import time
 import multiprocessing
-import logging
+import multiproc_logging
 import typer
 
 from pipe_boids import PipeSpace, PipeCommunication
 import boids_game as ba
 import boids_animate as bv
-
 boids_app = typer.Typer(name="boids", add_completion=False)
 
 @boids_app.command(name="pygame")
@@ -20,67 +19,62 @@ def run_with_matplotlib() -> None:
     """Run simulation with matplotlib visualiser"""
     boids_sim("matplotlib")
 
-def run_animation() -> None:
+def run_animation(logger_queue) -> None:
     """Run the animation loop"""
+    multiproc_logging.setup_worker_logging(logger_queue, "boids.visualiser")
     visualiser = bv.BoidVisualiser()
     visualiser.animate()
 
-def boids_sim_thread_func() -> multiprocessing.Process:
+
+def boids_sim_thread_func(logger_queue) -> multiprocessing.Process:
     """Create and return a Process to run the boids simulation"""
     def sim_target():
+        multiproc_logging.setup_worker_logging(logger_queue, "boids.space")
+        multiproc_logging.setup_worker_logging(logger_queue, "boids.boid")
         comm = PipeCommunication()
         space = PipeSpace(comm)
         space.sim_loop()
-
     process = multiprocessing.Process(target=sim_target)
     return process
 
+
 def boids_sim(visualiser: Literal["pygame", "matplotlib"]) -> None:
-    """
-    Run the boids simulation with the specified visualiser
+    """Run the boids simulation with the specified visualiser"""
+    logger_queue, logger_proc = multiproc_logging.start_logging_proc()
+    runner_logger = multiproc_logging.setup_worker_logging(logger_queue, "boids.runner")
+    runner_logger.info("Starting boids simulation")
 
-    Args:
-        visualiser: The visualization backend to use ("pygame" or "matplotlib")
-    """
-    logger = setup_logging()
-    logger.info("Starting boids simulation")
-
-    generator_proc = boids_sim_thread_func()
+    generator_proc = boids_sim_thread_func(logger_queue)
     generator_proc.start()
     time.sleep(2)
 
-    logger.info("Starting visualization")
+    runner_logger.info("Starting visualization")
 
     try:
         if visualiser == "pygame":
-            visualiser = ba.GameVisuliser()
-            visualiser.loop()
+            visualiser_obj = ba.GameVisuliser()
+            visualiser_obj.loop()
         else:
-            visualization_proc = multiprocessing.Process(target=run_animation)
+            visualization_proc = multiprocessing.Process(target=run_animation, args=(logger_queue,))
             visualization_proc.start()
 
             while True:
                 if not visualization_proc.is_alive():
-                    logger.info("Visualization process ended")
-                    generator_proc.terminate()
+                    runner_logger.info("Visualization process ended")
                     break
                 if not generator_proc.is_alive():
-                    logger.info("Generator process ended")
-                    visualization_proc.terminate()
+                    runner_logger.info("Generator process ended")
                     break
-                time.sleep(0.1)
-
+                time.sleep(0.25)
     except KeyboardInterrupt:
-        logger.info("Received keyboard interrupt, shutting down...")
-    except Exception as e:
-        logger.error(f"Error during simulation: {e}")
+        runner_logger.info("Received keyboard interrupt, shutting down...")
+    except Exception as e:  # pragma: no cover
+        runner_logger.error(f"Error during simulation: {e}")
     finally:
-        if 'generator_proc' in locals() and generator_proc.is_alive():
-            generator_proc.terminate()
-            generator_proc.join()
+        if generator_proc.is_alive():
+            generator_proc.join(timeout=3)
         if 'visualization_proc' in locals() and visualization_proc.is_alive():
-            visualization_proc.terminate()
-            visualization_proc.join()
+            visualization_proc.join(timeout=3)
 
 if __name__ == "__main__":
     boids_app()

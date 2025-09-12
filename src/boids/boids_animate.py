@@ -39,7 +39,7 @@ class BoidVisualiser():
         self.ax.tick_params(left = False, right = False , labelleft = False , 
                 labelbottom = False, bottom = False)
         self.pipe_access = PipeReadHandler(params.PIPE)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger("boids.visualiser")
 
 
     def update_boids(self, _):
