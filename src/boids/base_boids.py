@@ -50,6 +50,9 @@ class BaseBoid(ABC):
         self.limit_speed()
 
         self.position += self.velocity*params.STEP_SIZE
+        self.logger.debug("Boid at (%.2f, %.2f) with velocity (%.2f, %.2f) has %d neighbours and %d colliding",
+                          self.x, self.y, self.vx, self.vy,
+                          num_nearest_neighbours, len(colliding_neighbours))
 
         self.logger.debug(
             "Boid at (%.2f, %.2f) with velocity (%.2f, %.2f) has %d neighbours and %d colliding",
