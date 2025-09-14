@@ -27,35 +27,39 @@ class BaseBoid(ABC):
         self._velocity = np.array([vx, vy], dtype=float)
         self._boids = boids
         self.logger = logging.getLogger("boids.boid")
+        self.mass = 0.25
 
 
     def move(self):
         """
-        We work out the average velocity of "neighbouring" boids and then add the difference to the 
+        We work out the average velocity of "neighbouring" boids and then add the difference to the
         boids velocity with some small scaling factor  This acts to get them all moving the same
         direction
         """
 
-        nearest_neighbours,colliding_neighbours, local_average_pos, local_average_vel = \
-            self.nearest_neighbour_props()
-        num_nearest_neighbours = len(nearest_neighbours)
+        nearest_visual_neighbours, nearest_avoiding_neighbours, colliding_neighbours, local_average_pos, local_average_vel = self.nearest_neighbour_props()
+        num_nearest_neighbours = len(nearest_visual_neighbours)
         self.velocity = (self.velocity
                     +self.move_together(num_nearest_neighbours,local_average_pos,local_average_vel)
-                    +self.handle_edges()
-                    +self.move_away()
+                    +self.move_away(nearest_avoiding_neighbours)
                         )
 
+        self.handle_interboid_collisions(colliding_neighbours)
+        self.handle_edges()
         self.limit_speed()
 
         self.position += self.velocity*params.STEP_SIZE
-        self.logger.debug("Boid at (%.2f, %.2f) with velocity (%.2f, %.2f) has %d neighbours and %d colliding",
-                          self.x, self.y, self.vx, self.vy,
-                          num_nearest_neighbours, len(colliding_neighbours))
+
+        self.logger.debug(
+            "Boid at (%.2f, %.2f) with velocity (%.2f, %.2f) has %d neighbours and %d colliding",
+            self.x, self.y, self.vx, self.vy,
+            num_nearest_neighbours, len(colliding_neighbours)
+        )
 
     def move_together(self, num_near_neighbours, local_average_pos, local_average_vel):
         """
         We work out the average velocity of "neighbouring" boids and then add the difference to the
-        boids velocity with some small scaling factor  
+        boids velocity with some small scaling factor
         This acts to get them all moving the same direction
         """
         velocity_change = np.array([0,0],dtype=float)
@@ -65,28 +69,45 @@ class BaseBoid(ABC):
 
             local_average_pos = local_average_pos/num_near_neighbours
             velocity_change += (local_average_pos-self.position)*params.centering_factor
-
+        self.logger.debug("Velocity change due to moving together: %s", velocity_change)
         return velocity_change
+
 
     def nearest_neighbour_props(self):
         """
         Find the nearest neighbours to the boid and return the list of these, the average position
         and velocity of these neighbours
+        We also return a list of boids that are too close (colliding) and those that are in the
+        avoid distance
         """
-        local_average_vel = np.array([0,0],dtype=float)
+        local_average_vel = np.array([3,0],dtype=float)
         local_average_pos = np.array([0,0],dtype=float)
-        nearest_neighbours:set = set()
+        nearest_visual_neighbours:set = set()
         colliding_neighbours:set = set()
+        avoiding_neighbours:set = set()
         for ob in self._boids:
-            if (calc_norm := norm(ob.position - self.position)) < params.visual_dist:
+            if((calc_norm := norm(ob.position - self.position)) < params.visual_dist):
                 local_average_vel += ob.velocity
                 local_average_pos += ob.position
-                nearest_neighbours.add(ob)
-                if calc_norm < 2*params.min_seperation:
+                self.logger.debug("Norm between boids: %s", calc_norm)
+                if(calc_norm < 2*params.min_seperation):
                     colliding_neighbours.add(ob)
+                elif(calc_norm < params.avoid_dist):
+                    avoiding_neighbours.add(ob)
+                else:
+                    nearest_visual_neighbours.add(ob)
+
+        self.logger.debug("Nearest visual neighbours position and velocity: %s, %s",
+                           local_average_vel, local_average_vel)
 
 
-        return nearest_neighbours, colliding_neighbours, local_average_pos, local_average_vel
+        return (nearest_visual_neighbours, avoiding_neighbours, colliding_neighbours,
+                local_average_pos,local_average_vel)
+
+    def handle_interboid_collisions(self, colliding_neighbours):
+        for ob in colliding_neighbours:
+            self.velocity = ((self.mass-ob.mass)*self.velocity+2*ob.mass*ob.velocity)/(self.mass+ob.mass)
+
 
     def limit_speed(self):
         """
@@ -108,34 +129,34 @@ class BaseBoid(ABC):
         velocity such that it will start to make a turn from the wall with every
         time step
         """
-        diff_vx = 0
-        diff_vy = 0
-        #TODO: We want turn speed to be a function of the distance from the wall, increasing the
-        # closer we are to the wall (so the boid doesn't hit the wall!)
         if self.x < params.left_margin:
-            diff_vx = params.turn_speed
+            self.velocity[0] =  abs(self.velocity[0])
         if self.x > params.right_margin:
-            diff_vx = -params.turn_speed
-        if self.y < params.bottom_margin:
-            diff_vy = params.turn_speed
-        if self.y > params.top_margin:
-            diff_vy  = -params.turn_speed
+            self.velocity[0] = -abs(self.velocity[0])
+        if self.y > params.bottom_margin:
+            self.velocity[1] = -abs(self.velocity[1])
+        if self.y < params.top_margin:
+            self.velocity[1] = abs(self.velocity[1])
 
-        return np.array([diff_vx,diff_vy],dtype=float)
-
-    def move_away(self):
+    def move_away(self, nearest_avoiding_neighbours):
         """
             Dealing with getting away from another boid that has gotten too
             close, this is done by keeping creating a vector pointing in
             opposite direction to any boids "too close" and then adding this to
             some overall "move away" vector which is moved in (with some scaling)
-        """
-        move_away_vec = np.array([0,0],dtype=float)
-        for ob in self._boids:
-            if norm(ob.position - self.position) < params.min_seperation:
-                move_away_vec += self.position - ob.position
 
-        return move_away_vec*params.move_away_factor
+            We also handle collisions with the 'wall' here, by considering the wall as a form of 
+            elastic collision
+        """ 
+        diff_velocity_avoid = np.array([0,0],dtype=float)
+
+        for ob in nearest_avoiding_neighbours:
+            diff_velocity_avoid += (self.position - ob.position)*params.move_away_factor
+
+        self.logger.debug("Velocity change due to avoidance away: %s", diff_velocity_avoid)
+
+        return  diff_velocity_avoid
+
 
 
     #Getters and Setters
