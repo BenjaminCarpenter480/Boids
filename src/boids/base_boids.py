@@ -40,6 +40,7 @@ class BaseBoid(ABC):
         nearest_visual_neighbours, nearest_avoiding_neighbours, colliding_neighbours, local_average_pos, local_average_vel = self.nearest_neighbour_props()
         num_nearest_neighbours = len(nearest_visual_neighbours)
         self.velocity = (self.velocity
+                    +self.move_random()
                     +self.move_together(num_nearest_neighbours,local_average_pos,local_average_vel)
                     +self.move_away(nearest_avoiding_neighbours)
                         )
@@ -55,6 +56,18 @@ class BaseBoid(ABC):
             self.x, self.y, self.vx, self.vy,
             num_nearest_neighbours, len(colliding_neighbours)
         )
+
+    def move_random(self):
+        """
+        Add a small random velocity change to the boid to prevent it getting stuck
+        in a local minima
+        """
+        move_randomly:bool = np.random.random() < params.MOVE_RANDOM_PROBABILITY
+        if move_randomly:
+            random_velocity = (np.random.rand(2)-0.5)*2*params.randomness_factor
+            self.logger.debug("Random velocity change: %s", random_velocity)
+            return random_velocity
+        return np.array([0,0],dtype=float)
 
     def move_together(self, num_near_neighbours, local_average_pos, local_average_vel):
         """
