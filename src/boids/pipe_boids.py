@@ -6,7 +6,6 @@ from typing import BinaryIO
 from base_boids import BaseBoid, BaseSpace, BoidState, CommunicationStrategy
 from parameters import Parameters as params
 
-
 class PipeCommunication(CommunicationStrategy):
     """Pipe-based communication strategy"""
     def __init__(self) -> None:
