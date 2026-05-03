@@ -1,32 +1,12 @@
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
 import numpy as np
 from parameters import Parameters as params
 from numpy.linalg import norm
 from typing import List
 import logging
+from base_boids import BaseBoid, BoidState
 
-@dataclass
-class BoidState:
-    """Data structure for boid state"""
-    x: float
-    y: float
-    vx: float
-    vy: float
-
-class CommunicationStrategy(ABC):
-    """Protocol for different communication methods"""
-    def write_state(self, state: BoidState) -> None: ...
-    def write_frame_end(self) -> None: ...
-    def cleanup(self) -> None: ...
-
-class BaseBoid(ABC):
-    """Base class for all boid implementations
-    
-    This will basically decide the overall structure of the class and physical interactions between 
-    boids such as collisions and edge conditions. 
-    
-    """
+class StandardBoid(BaseBoid):
+    """Standard boid follow behaviour class implementing basic flocking behaviours"""
     def __init__(self, boids: List['BaseBoid'], x: float, y: float, vx: float, vy: float) -> None:
         self._position = np.array([x, y], dtype=float)
         self._velocity = np.array([vx, vy], dtype=float)
@@ -35,29 +15,32 @@ class BaseBoid(ABC):
         self.mass = 0.25
 
     def move(self):
-        """Overall movement logic for a boid called at each time step
+        """
+        We work out the average velocity of "neighbouring" boids and then add the difference to the
+        boids velocity with some small scaling factor  This acts to get them all moving the same
+        direction
         
+        If a boid is too close to another boid then we add a velocity change to move it away from
+        the other boid, this is done by keeping creating a vector pointing in opposite direction to
+        any boids "too close" and then summing these and adding to the overall velocity
+        
+        Finally we shall add a small random velocity change to the boid to prevent it getting stuck 
+        and add some randomness to the system
         """
         nearest_visual_neighbours, nearest_avoiding_neighbours, colliding_neighbours,\
             local_average_pos, local_average_vel = self.nearest_neighbour_props()
         num_nearest_neighbours = len(nearest_visual_neighbours)
-        
-        # Handle flocking/ 'decided' movement first 
         self.velocity = (self.velocity
                     +self.move_random()
                     +self.move_together(num_nearest_neighbours,local_average_pos,local_average_vel)
                     +self.move_away(nearest_avoiding_neighbours)
                         )
 
-        # Handle collisions, edges and speed limits after calculating the new velocity
         self.handle_interboid_collisions(colliding_neighbours)
         self.handle_edges()
         self.limit_speed()
 
         self.position += self.velocity*params.STEP_SIZE
-        self.logger.debug("Boid at (%.2f, %.2f) with velocity (%.2f, %.2f) has %d neighbours and %d colliding",
-                          self.x, self.y, self.vx, self.vy,
-                          num_nearest_neighbours, len(colliding_neighbours))
 
         self.logger.debug(
             "Boid at (%.2f, %.2f) with velocity (%.2f, %.2f) has %d neighbours and %d colliding",
@@ -79,23 +62,20 @@ class BaseBoid(ABC):
 
     def move_together(self, num_near_neighbours, local_average_pos, local_average_vel):
         """
-        In this base implementation, we do not implement any specific behavior for moving together;
-        this method can be overridden in subclasses to define specific flocking behavior.
+        We work out the average velocity of "neighbouring" boids and then add the difference to the
+        boids velocity with some small scaling factor
+        This acts to get them all moving the same direction
         """
         velocity_change = np.array([0,0],dtype=float)
+        if num_near_neighbours > 0:
+            local_average_vel = local_average_vel/num_near_neighbours
+            velocity_change += (local_average_vel-self.velocity)*params.match_speed_factor
+
+            local_average_pos = local_average_pos/num_near_neighbours
+            velocity_change += (local_average_pos-self.position)*params.centering_factor
         self.logger.debug("Velocity change due to moving together: %s", velocity_change)
         return velocity_change
 
-    def move_away(self, nearest_avoiding_neighbours):
-        """
-        In this base implementation, we do not implement any specific behavior for moving away;
-        this method can be overridden in subclasses to define specific avoidance behavior.
-        """
-        diff_velocity_avoid = np.array([0,0],dtype=float)
-
-        self.logger.debug("Velocity change due to avoidance away: %s", diff_velocity_avoid)
-
-        return  diff_velocity_avoid
 
     def nearest_neighbour_props(self):
         """
@@ -104,7 +84,7 @@ class BaseBoid(ABC):
         We also return a list of boids that are too close (colliding) and those that are in the
         avoid distance
         """
-        local_average_vel = np.array([3,0],dtype=float)
+        local_average_vel = np.array([0,0],dtype=float)
         local_average_pos = np.array([0,0],dtype=float)
         nearest_visual_neighbours:set = set()
         colliding_neighbours:set = set()
@@ -122,7 +102,7 @@ class BaseBoid(ABC):
                     nearest_visual_neighbours.add(ob)
 
         self.logger.debug("Nearest visual neighbours position and velocity: %s, %s",
-                           local_average_vel, local_average_vel)
+                           local_average_pos, local_average_vel)
 
 
         return (nearest_visual_neighbours, avoiding_neighbours, colliding_neighbours,
@@ -166,6 +146,24 @@ class BaseBoid(ABC):
         if self.y < params.top_margin:
             self.velocity[1] = abs(self.velocity[1])
 
+    def move_away(self, nearest_avoiding_neighbours):
+        """
+            Dealing with getting away from another boid that has gotten too
+            close, this is done by keeping creating a vector pointing in
+            opposite direction to any boids "too close" and then adding this to
+            some overall "move away" vector which is moved in (with some scaling)
+
+            We also handle collisions with the 'wall' here, by considering the wall as a form of 
+            elastic collision
+        """ 
+        diff_velocity_avoid = np.array([0,0],dtype=float)
+
+        for ob in nearest_avoiding_neighbours:
+            diff_velocity_avoid += (self.position - ob.position)*params.move_away_factor
+
+        self.logger.debug("Velocity change due to avoidance away: %s", diff_velocity_avoid)
+
+        return  diff_velocity_avoid
 
     #Getters and Setters
     @property
@@ -221,27 +219,3 @@ class BaseBoid(ABC):
     def state(self) -> BoidState:
         """Get current boid state"""
         return BoidState(self.x, self.y, self.vx, self.vy)
-
-class BaseSpace(ABC):
-    """Base class for all space implementations"""
-    def __init__(self, comm_strategy: CommunicationStrategy) -> None:
-        self.logger = logging.getLogger("boids.space")
-        # Do not set level or add handlers here; handled by multiproc_logging
-        self.boid_list: List[BaseBoid] = []
-        self.comm = comm_strategy
-        self._initialize_boids()
-
-    @abstractmethod
-    def _initialize_boids(self) -> None:
-        """Initialize boid population"""
-
-    def sim_loop(self) -> None:
-        """Core simulation loop"""
-        try:
-            while True:
-                for boid in self.boid_list:
-                    boid.move()
-                    self.comm.write_state(boid.state)
-                self.comm.write_frame_end()
-        finally:
-            self.comm.cleanup()

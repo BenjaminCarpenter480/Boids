@@ -20,9 +20,9 @@ class BoidVisualiser():
         self.ax.set_xlim(0, params.DOMAIN)
         self.ax.set_ylim(0, params.DOMAIN)
         self.ani = None
-        # Calculate the marker size based on the min_seperation
+        # Calculate the marker size based on the min_separation
         # From https://stackoverflow.com/a/65177849
-        marker_size = (2*(self.ax.transData.transform([params.min_seperation,0])[0]
+        marker_size = (2*(self.ax.transData.transform([params.min_separation,0])[0]
                                 -self.ax.transData.transform([0,0])[0]))
 
 

@@ -18,7 +18,7 @@ class Parameters:
 
     visual_dist    = 500 # Distance a boid can see, they'll try to match speed and move towards the average position of boids in this range
     avoid_dist     = 400 # Distance at which boids will act to move apart
-    min_seperation = 150  # Size of a boid, if they get within 2* this distance to another boid they are considered collided
+    min_separation = 150  # Size of a boid, if they get within 2* this distance to another boid they are considered collided
     
     match_speed_factor = 0.6
     centering_factor = 0

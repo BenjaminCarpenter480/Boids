@@ -4,6 +4,7 @@ from random import randint, random
 from typing import BinaryIO
 
 from base_boids import BaseBoid, BaseSpace, BoidState, CommunicationStrategy
+from standard_boid import StandardBoid
 from parameters import Parameters as params
 
 class PipeCommunication(CommunicationStrategy):
@@ -61,8 +62,8 @@ class PipeSpace(BaseSpace):
         for boid in self.boid_list:
             boid._boids = self.boid_list
 
-class PipeBoid(BaseBoid):
+class PipeBoid(StandardBoid):
     """Boid implementation for pipe communication.
 
-    Inherits all functionality from BaseBoid; no additional behavior is defined here.
+    Inherits all functionality from StandardBoid; no additional behavior is defined here.
     """

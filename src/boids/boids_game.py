@@ -41,7 +41,7 @@ class BoidSprite():
     def __init__(self, x, y, vx, vy, world) -> None:
         self.kinematic_array  = np.array([0, 0, 0, 0])
         self.color = np.random.randint(0, 255, 3)
-        self.size = params.min_seperation/20
+        self.size = params.min_separation/20
         self.world = world
 
     def draw(self):
