@@ -38,26 +38,22 @@ class BaseBoid(ABC):
         """Overall movement logic for a boid called at each time step
         
         """
+
+
         nearest_visual_neighbours, nearest_avoiding_neighbours, colliding_neighbours,\
             local_average_pos, local_average_vel = self.nearest_neighbour_props()
         num_nearest_neighbours = len(nearest_visual_neighbours)
-        
-        # Handle flocking/ 'decided' movement first 
+
+        # Handle flocking/ 'decided' movement first
         self.velocity = (self.velocity
                     +self.move_random()
                     +self.move_together(num_nearest_neighbours,local_average_pos,local_average_vel)
                     +self.move_away(nearest_avoiding_neighbours)
                         )
 
-        # Handle collisions, edges and speed limits after calculating the new velocity
-        self.handle_interboid_collisions(colliding_neighbours)
-        self.handle_edges()
-        self.limit_speed()
-
         self.position += self.velocity*params.STEP_SIZE
-        self.logger.debug("Boid at (%.2f, %.2f) with velocity (%.2f, %.2f) has %d neighbours and %d colliding",
-                          self.x, self.y, self.vx, self.vy,
-                          num_nearest_neighbours, len(colliding_neighbours))
+
+        self.handle_edges()
 
         self.logger.debug(
             "Boid at (%.2f, %.2f) with velocity (%.2f, %.2f) has %d neighbours and %d colliding",
@@ -127,29 +123,6 @@ class BaseBoid(ABC):
 
         return (nearest_visual_neighbours, avoiding_neighbours, colliding_neighbours,
                 local_average_pos,local_average_vel)
-
-    def handle_interboid_collisions(self, colliding_neighbours):
-        """Work out the new velocity of the boid after colliding with any other boids that are too close,
-        we treat this as an elastic collision
-        
-        """
-        for ob in colliding_neighbours:
-            self.velocity = ((self.mass-ob.mass)*self.velocity+2*ob.mass*ob.velocity)/(self.mass+ob.mass)
-
-    def limit_speed(self):
-        """
-        Prevent boids from moving too fast or too slow, simply by normalising the velocity vector
-        for correct direction and then multiplying by the max or min speed if the speed is too high
-        or low
-
-        TODO: Should use the current speed of the boid not the previous step speed.
-        TODO: This stops conservation of system energy
-        """
-        speed = norm(self.velocity)
-        if speed>params.max_speed:
-            self.velocity = (self.velocity/speed)*params.max_speed
-        elif speed<params.min_speed:
-            self.velocity = (self.velocity/speed)*params.min_speed
 
     def handle_edges(self):
         """
@@ -242,6 +215,39 @@ class BaseSpace(ABC):
                 for boid in self.boid_list:
                     boid.move()
                     self.comm.write_state(boid.state)
+                    
+                self.handle_interboid_collisions()
+                    
+                for boid in self.boid_list:
+                    self.comm.write_state(boid.state)
+
                 self.comm.write_frame_end()
         finally:
             self.comm.cleanup()
+
+
+    def handle_interboid_collisions(self):
+        """
+        Handle collisions between boids across the whole space.
+        """
+        for i, bi in enumerate(self.boid_list):
+            for j, bj in enumerate(self.boid_list):
+                if i < j:
+                    self._resolve_pair_collision(bi, bj)  
+
+    def _resolve_pair_collision(self, b1, b2) -> None:
+        """Apply elastic impulse between two boids if they overlap"""
+        delta_pos = b1.position - b2.position
+        dist = norm(delta_pos)
+        
+        # Check if overlapping (adjust threshold as needed)
+        if dist < 2 * params.min_separation:
+            n = delta_pos / dist  # unit normal from b2 -> b1
+            v_rel = b1.velocity - b2.velocity
+            v_rel_n = np.dot(v_rel, n)
+            
+            # Only collide if approaching
+            if v_rel_n < 0:
+                j = -v_rel_n / (1/b1.mass + 1/b2.mass)  # e=1 for elastic
+                b1.velocity += (j / b1.mass) * n
+                b2.velocity -= (j / b2.mass) * n

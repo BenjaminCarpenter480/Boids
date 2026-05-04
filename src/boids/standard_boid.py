@@ -40,7 +40,7 @@ class StandardBoid(BaseBoid):
 
             We also handle collisions with the 'wall' here, by considering the wall as a form of 
             elastic collision
-        """ 
+        """
         diff_velocity_avoid = np.array([0,0],dtype=float)
 
         for ob in nearest_avoiding_neighbours:

@@ -62,7 +62,8 @@ class PipeSpace(BaseSpace):
         for boid in self.boid_list:
             boid._boids = self.boid_list
 
-class PipeBoid(StandardBoid):
+# class PipeBoid(BaseBoid):
+class PipeBoid(BaseBoid):
     """Boid implementation for pipe communication.
 
     Inherits all functionality from StandardBoid; no additional behavior is defined here.
