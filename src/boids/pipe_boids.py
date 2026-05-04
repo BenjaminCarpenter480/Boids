@@ -63,7 +63,6 @@ class PipeSpace(BaseSpace):
         for boid in self.boid_list:
             boid._boids = self.boid_list
 
-# class PipeBoid(BaseBoid):
 class PipeBoid(BaseBoid):
     """Boid implementation for pipe communication.
 
