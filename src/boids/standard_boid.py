@@ -13,39 +13,6 @@ class StandardBoid(BaseBoid):
         self.logger = logging.getLogger("boids.boid")
         self.mass = 0.25
 
-    def move(self):
-        """
-        We work out the average velocity of "neighbouring" boids and then add the difference to the
-        boids velocity with some small scaling factor  This acts to get them all moving the same
-        direction
-        
-        If a boid is too close to another boid then we add a velocity change to move it away from
-        the other boid, this is done by keeping creating a vector pointing in opposite direction to
-        any boids "too close" and then summing these and adding to the overall velocity
-        
-        Finally we shall add a small random velocity change to the boid to prevent it getting stuck 
-        and add some randomness to the system
-        """
-        nearest_visual_neighbours, nearest_avoiding_neighbours, colliding_neighbours,\
-            local_average_pos, local_average_vel = self.nearest_neighbour_props()
-        num_nearest_neighbours = len(nearest_visual_neighbours)
-        self.velocity = (self.velocity
-                    +self.move_random()
-                    +self.move_together(num_nearest_neighbours,local_average_pos,local_average_vel)
-                    +self.move_away(nearest_avoiding_neighbours)
-                        )
-
-        self.handle_interboid_collisions(colliding_neighbours)
-        self.handle_edges()
-        self.limit_speed()
-
-        self.position += self.velocity*params.STEP_SIZE
-
-        self.logger.debug(
-            "Boid at (%.2f, %.2f) with velocity (%.2f, %.2f) has %d neighbours and %d colliding",
-            self.x, self.y, self.vx, self.vy,
-            num_nearest_neighbours, len(colliding_neighbours)
-        )
 
     def move_together(self, num_near_neighbours, local_average_pos, local_average_vel):
         """
@@ -62,7 +29,6 @@ class StandardBoid(BaseBoid):
             velocity_change += (local_average_pos-self.position)*params.centering_factor
         self.logger.debug("Velocity change due to moving together: %s", velocity_change)
         return velocity_change
-
 
 
     def move_away(self, nearest_avoiding_neighbours):
