@@ -100,7 +100,7 @@ class BaseBoid(ABC):
         We also return a list of boids that are too close (colliding) and those that are in the
         avoid distance
         """
-        local_average_vel = np.array([3,0],dtype=float)
+        local_average_vel = np.array([0,0],dtype=float)
         local_average_pos = np.array([0,0],dtype=float)
         nearest_visual_neighbours:set = set()
         colliding_neighbours:set = set()
