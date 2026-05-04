@@ -7,12 +7,7 @@ from base_boids import BaseBoid, BoidState
 class StandardBoid(BaseBoid):
     """Standard boid follow behaviour class implementing basic flocking behaviours"""
     def __init__(self, boids: List['BaseBoid'], x: float, y: float, vx: float, vy: float) -> None:
-        self._position = np.array([x, y], dtype=float)
-        self._velocity = np.array([vx, vy], dtype=float)
-        self._boids = boids
-        self.logger = logging.getLogger("boids.boid")
-        self.mass = 0.25
-
+        super().__init__(boids, x, y, vx, vy)
 
     def move_together(self, num_near_neighbours, local_average_pos, local_average_vel):
         """

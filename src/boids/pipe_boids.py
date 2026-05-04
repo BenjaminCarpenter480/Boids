@@ -66,5 +66,5 @@ class PipeSpace(BaseSpace):
 class PipeBoid(BaseBoid):
     """Boid implementation for pipe communication.
 
-    Inherits all functionality from StandardBoid; no additional behavior is defined here.
+    Inherits all functionality from parents; no additional behavior is defined here.
     """
