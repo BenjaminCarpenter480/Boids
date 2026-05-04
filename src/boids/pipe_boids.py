@@ -36,6 +36,7 @@ class PipeCommunication(CommunicationStrategy):
     def write_frame_end(self) -> None:
         if self.pipe:
             self.pipe.write(bytes("\n", 'ASCII'))
+            self.pipe.flush()
 
     def cleanup(self) -> None:
         if self.pipe:
