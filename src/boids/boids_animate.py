@@ -9,6 +9,7 @@ import matplotlib.animation as animation
 import numpy as np
 from parameters import Parameters as params
 from boids_game import PipeReadHandler
+import sys
 
 class BoidVisualiser():
     """
