@@ -214,7 +214,6 @@ class BaseSpace(ABC):
             while True:
                 for boid in self.boid_list:
                     boid.move()
-                    self.comm.write_state(boid.state)
                     
                 self.handle_interboid_collisions()
                     
