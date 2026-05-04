@@ -1,6 +1,5 @@
 import numpy as np
 from parameters import Parameters as params
-from numpy.linalg import norm
 from typing import List
 import logging
 from base_boids import BaseBoid, BoidState
@@ -48,18 +47,6 @@ class StandardBoid(BaseBoid):
             num_nearest_neighbours, len(colliding_neighbours)
         )
 
-    def move_random(self):
-        """
-        Add a small random velocity change to the boid to prevent it getting stuck
-        in a local minima
-        """
-        move_randomly:bool = np.random.random() < params.MOVE_RANDOM_PROBABILITY
-        if move_randomly:
-            random_velocity = (np.random.rand(2)-0.5)*2*params.randomness_factor
-            self.logger.debug("Random velocity change: %s", random_velocity)
-            return random_velocity
-        return np.array([0,0],dtype=float)
-
     def move_together(self, num_near_neighbours, local_average_pos, local_average_vel):
         """
         We work out the average velocity of "neighbouring" boids and then add the difference to the
@@ -77,74 +64,6 @@ class StandardBoid(BaseBoid):
         return velocity_change
 
 
-    def nearest_neighbour_props(self):
-        """
-        Find the nearest neighbours to the boid and return the list of these, the average position
-        and velocity of these neighbours
-        We also return a list of boids that are too close (colliding) and those that are in the
-        avoid distance
-        """
-        local_average_vel = np.array([0,0],dtype=float)
-        local_average_pos = np.array([0,0],dtype=float)
-        nearest_visual_neighbours:set = set()
-        colliding_neighbours:set = set()
-        avoiding_neighbours:set = set()
-        for ob in self._boids:
-            if((calc_norm := norm(ob.position - self.position)) < params.visual_dist):
-                local_average_vel += ob.velocity
-                local_average_pos += ob.position
-                self.logger.debug("Norm between boids: %s", calc_norm)
-                if calc_norm < 2*params.min_separation:
-                    colliding_neighbours.add(ob)
-                elif calc_norm < params.avoid_dist:
-                    avoiding_neighbours.add(ob)
-                else:
-                    nearest_visual_neighbours.add(ob)
-
-        self.logger.debug("Nearest visual neighbours position and velocity: %s, %s",
-                           local_average_pos, local_average_vel)
-
-
-        return (nearest_visual_neighbours, avoiding_neighbours, colliding_neighbours,
-                local_average_pos,local_average_vel)
-
-    def handle_interboid_collisions(self, colliding_neighbours):
-        """Work out the new velocity of the boid after colliding with any other boids that are too close,
-        we treat this as an elastic collision
-        
-        """
-        for ob in colliding_neighbours:
-            self.velocity = ((self.mass-ob.mass)*self.velocity+2*ob.mass*ob.velocity)/(self.mass+ob.mass)
-
-    def limit_speed(self):
-        """
-        Prevent boids from moving too fast or too slow, simply by normalising the velocity vector
-        for correct direction and then multiplying by the max or min speed if the speed is too high
-        or low
-
-        TODO: Should use the current speed of the boid not the previous step speed.
-        TODO: This stops conservation of system energy
-        """
-        speed = norm(self.velocity)
-        if speed>params.max_speed:
-            self.velocity = (self.velocity/speed)*params.max_speed
-        elif speed<params.min_speed:
-            self.velocity = (self.velocity/speed)*params.min_speed
-
-    def handle_edges(self):
-        """
-        When a boid reaches the edge of space (a wall) we want to modify its
-        velocity such that it will start to make a turn from the wall with every
-        time step
-        """
-        if self.x < params.left_margin:
-            self.velocity[0] =  abs(self.velocity[0])
-        if self.x > params.right_margin:
-            self.velocity[0] = -abs(self.velocity[0])
-        if self.y > params.bottom_margin:
-            self.velocity[1] = -abs(self.velocity[1])
-        if self.y < params.top_margin:
-            self.velocity[1] = abs(self.velocity[1])
 
     def move_away(self, nearest_avoiding_neighbours):
         """
