@@ -118,7 +118,7 @@ class BaseBoid(ABC):
                     nearest_visual_neighbours.add(ob)
 
         self.logger.debug("Nearest visual neighbours position and velocity: %s, %s",
-                           local_average_vel, local_average_vel)
+                           local_average_pos, local_average_vel)
 
 
         return (nearest_visual_neighbours, avoiding_neighbours, colliding_neighbours,
