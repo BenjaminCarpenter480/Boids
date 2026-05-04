@@ -9,6 +9,7 @@ import matplotlib.animation as animation
 import numpy as np
 from parameters import Parameters as params
 from boids_game import PipeReadHandler
+import sys
 
 class BoidVisualiser():
     """
@@ -20,17 +21,23 @@ class BoidVisualiser():
         self.ax.set_xlim(0, params.DOMAIN)
         self.ax.set_ylim(0, params.DOMAIN)
         self.ani = None
-        # Calculate the marker size based on the min_seperation
+        # Calculate the marker size based on the min_separation
         # From https://stackoverflow.com/a/65177849
-        marker_size = (2*(self.ax.transData.transform([params.min_seperation,0])[0]
-                                -self.ax.transData.transform([0,0])[0]))
+        marker_size = ((self.ax.transData.transform([params.min_separation/2,0])[0]
+                                -self.ax.transData.transform([0,0])[0])**2*np.pi)
 
 
         self.boid_scatter = self.ax.scatter(np.zeros(params.NUM_BOIDS),
                                             np.zeros(params.NUM_BOIDS),
                                             s=marker_size,
                                             c=np.random.randint(0, 255, params.NUM_BOIDS))
-        self.ax.tick_params(left = False, right = False , labelleft = False ,
+        self.ax.set_xlim(-params.DOMAIN*0.2, params.DOMAIN*1.2)
+        self.ax.set_ylim(-params.DOMAIN*0.2, params.DOMAIN*1.2)
+        self.ax.scatter(0,0)
+        self.ax.scatter(0,params.DOMAIN)
+        self.ax.scatter(params.DOMAIN, params.DOMAIN)
+        self.ax.scatter(params.DOMAIN, 0)
+        self.ax.tick_params(left = False, right = False , labelleft = False , 
                 labelbottom = False, bottom = False)
         self.pipe_access = PipeReadHandler(params.PIPE)
         self.logger = logging.getLogger("boids.visualiser")
@@ -63,6 +70,7 @@ class BoidVisualiser():
                                        frames=1000
                                        )
         plt.show()
+        sys.exit()
 
 
 if __name__ == '__main__':

@@ -4,11 +4,8 @@ from random import randint, random
 from typing import BinaryIO
 
 from base_boids import BaseBoid, BaseSpace, BoidState, CommunicationStrategy
+from standard_boid import StandardBoid
 from parameters import Parameters as params
-
-import debugpy
-debugpy.debug_this_thread()
-
 
 class PipeCommunication(CommunicationStrategy):
     """Pipe-based communication strategy"""
@@ -39,6 +36,7 @@ class PipeCommunication(CommunicationStrategy):
     def write_frame_end(self) -> None:
         if self.pipe:
             self.pipe.write(bytes("\n", 'ASCII'))
+            self.pipe.flush()
 
     def cleanup(self) -> None:
         if self.pipe:
@@ -68,5 +66,5 @@ class PipeSpace(BaseSpace):
 class PipeBoid(BaseBoid):
     """Boid implementation for pipe communication.
 
-    Inherits all functionality from BaseBoid; no additional behavior is defined here.
+    Inherits all functionality from parents; no additional behavior is defined here.
     """
