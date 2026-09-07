@@ -5,18 +5,18 @@ import multiproc_logging
 import typer
 
 from pipe_boids import PipeSpace, PipeCommunication
-import boids_game as ba
-import boids_animate as bv
 boids_app = typer.Typer(name="boids", add_completion=False)
 
 @boids_app.command(name="pygame")
 def run_with_pygame() -> None:
     """Run simulation with pygame visualiser"""
+    import boids_game as ba
     boids_sim("pygame")
 
 @boids_app.command(name="matplotlib")
 def run_with_matplotlib() -> None:
     """Run simulation with matplotlib visualiser"""
+    import boids_animate as bv
     boids_sim("matplotlib")
 
 def run_animation(logger_queue) -> None:
