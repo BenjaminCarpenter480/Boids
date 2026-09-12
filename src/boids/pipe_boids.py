@@ -2,6 +2,8 @@ import os
 import logging
 from random import randint, random
 from typing import BinaryIO
+import queue
+import threading
 
 from base_boids import BaseBoid, BaseSpace, BoidState, CommunicationStrategy
 from standard_boid import StandardBoid
@@ -68,3 +70,31 @@ class PipeBoid(BaseBoid):
 
     Inherits all functionality from parents; no additional behavior is defined here.
     """
+    
+class PipeReadHandler():
+    """
+    For reading data from the generator object
+
+    Data is returned as a string with each boid seperated by a ';' and each "," seperating the boid
+    attributes in the form x,y,vx,vy
+    """
+
+    def __init__(self, pipe_address=params.PIPE) -> None:
+        """Class to handle reading from the pipe
+        """
+        self.__pipe = open(pipe_address,"rb")
+        self.__data = queue.Queue()
+        self.__pipe_reader = threading.Thread(target=self.empty_pipe)
+        self.__pipe_reader.start()
+
+    def empty_pipe(self):
+        """
+        Read from the pipe and put the data in the queue to be accessed by the process
+        """
+        while self.__pipe.readable():
+            self.__data.put(self.__pipe.readline())
+
+    def get_data(self):
+        """Data stored in the pipe
+        """
+        return self.__data.get().decode('ASCII')

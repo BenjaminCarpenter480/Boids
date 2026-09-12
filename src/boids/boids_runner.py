@@ -5,8 +5,6 @@ import multiproc_logging
 import typer
 
 from pipe_boids import PipeSpace, PipeCommunication
-import boids_game as ba
-import boids_animate as bv
 boids_app = typer.Typer(name="boids", add_completion=False)
 
 @boids_app.command(name="pygame")
@@ -22,6 +20,7 @@ def run_with_matplotlib() -> None:
 def run_animation(logger_queue) -> None:
     """Run the animation loop"""
     multiproc_logging.setup_worker_logging(logger_queue, "boids.visualiser")
+    import boids_animate as bv
     visualiser = bv.BoidVisualiser()
     visualiser.animate()
 
@@ -52,6 +51,7 @@ def boids_sim(visualiser: Literal["pygame", "matplotlib"]) -> None:
 
     try:
         if visualiser == "pygame":
+            import boids_game as ba
             visualiser_obj = ba.GameVisuliser()
             visualiser_obj.loop()
         else:
