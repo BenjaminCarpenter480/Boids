@@ -31,12 +31,6 @@ class BoidVisualiser():
                                             np.zeros(params.NUM_BOIDS),
                                             s=marker_size,
                                             c=np.random.randint(0, 255, params.NUM_BOIDS))
-        self.ax.set_xlim(-params.DOMAIN*0.2, params.DOMAIN*1.2)
-        self.ax.set_ylim(-params.DOMAIN*0.2, params.DOMAIN*1.2)
-        self.ax.scatter(0,0)
-        self.ax.scatter(0,params.DOMAIN)
-        self.ax.scatter(params.DOMAIN, params.DOMAIN)
-        self.ax.scatter(params.DOMAIN, 0)
         self.ax.tick_params(left = False, right = False , labelleft = False , 
                 labelbottom = False, bottom = False)
         self.pipe_access = PipeReadHandler(params.PIPE)
