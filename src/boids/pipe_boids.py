@@ -2,6 +2,8 @@ import os
 import logging
 from random import randint, random
 from typing import BinaryIO
+import queue
+import threading
 
 from base_boids import BaseBoid, BaseSpace, BoidState, CommunicationStrategy
 from standard_boid import StandardBoid
