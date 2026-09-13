@@ -1,13 +1,13 @@
 import numpy as np
-from parameters import Parameters as params
+from parameters import Parameters
 from typing import List
 import logging
 from base_boids import BaseBoid, BoidState
 
 class StandardBoid(BaseBoid):
     """Standard boid follow behaviour class implementing basic flocking behaviours"""
-    def __init__(self, boids: List['BaseBoid'], x: float, y: float, vx: float, vy: float) -> None:
-        super().__init__(boids, x, y, vx, vy)
+    def __init__(self, boids: List['BaseBoid'], x: float, y: float, vx: float, vy: float, parameter_file_path: str = 'parameters/default.yaml') -> None:
+        super().__init__(boids, x, y, vx, vy, parameter_file_path)
 
     def move_together(self, num_near_neighbours, local_average_pos, local_average_vel):
         """
@@ -18,10 +18,10 @@ class StandardBoid(BaseBoid):
         velocity_change = np.array([0,0],dtype=float)
         if num_near_neighbours > 0:
             local_average_vel = local_average_vel/num_near_neighbours
-            velocity_change += (local_average_vel-self.velocity)*params.match_speed_factor
+            velocity_change += (local_average_vel-self.velocity)*self.parameters.match_speed_factor
 
             local_average_pos = local_average_pos/num_near_neighbours
-            velocity_change += (local_average_pos-self.position)*params.centering_factor
+            velocity_change += (local_average_pos-self.position)*self.parameters.centering_factor
         self.logger.debug("Velocity change due to moving together: %s", velocity_change)
         return velocity_change
 

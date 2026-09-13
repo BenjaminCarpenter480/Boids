@@ -1,7 +1,8 @@
+from typing import Optional
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 import numpy as np
-from parameters import Parameters as params
+from parameters import Parameters
 from numpy.linalg import norm
 from typing import List
 import logging
@@ -27,18 +28,18 @@ class BaseBoid(ABC):
     boids such as collisions and edge conditions. 
     
     """
-    def __init__(self, boids: List['BaseBoid'], x: float, y: float, vx: float, vy: float) -> None:
+    def __init__(self, boids: List['BaseBoid'], x: float, y: float, vx: float, vy: float, parameter_file_path: str = 'parameters/default.yaml') -> None:
         self._position = np.array([x, y], dtype=float)
         self._velocity = np.array([vx, vy], dtype=float)
         self._boids = boids
         self.logger = logging.getLogger("boids.boid")
         self.mass = 0.25
+        self.parameters = Parameters(parameter_file_path)
 
     def move(self):
         """Overall movement logic for a boid called at each time step
         
         """
-
 
         nearest_visual_neighbours, nearest_avoiding_neighbours, colliding_neighbours,\
             local_average_pos, local_average_vel = self.nearest_neighbour_props()
@@ -51,7 +52,7 @@ class BaseBoid(ABC):
                     +self.move_away(nearest_avoiding_neighbours)
                         )
 
-        self.position += self.velocity*params.STEP_SIZE
+        self.position += self.velocity*self.parameters.step_size
 
         self.handle_edges()
 
@@ -66,9 +67,9 @@ class BaseBoid(ABC):
         Add a small random velocity change to the boid to prevent it getting stuck
         in a local minima
         """
-        move_randomly:bool = np.random.random() < params.MOVE_RANDOM_PROBABILITY
+        move_randomly:bool = np.random.random() < self.parameters.move_random_probability
         if move_randomly:
-            random_velocity = (np.random.rand(2)-0.5)*2*params.randomness_factor
+            random_velocity = (np.random.rand(2)-0.5)*2*self.parameters.randomness_factor
             self.logger.debug("Random velocity change: %s", random_velocity)
             return random_velocity
         return np.array([0,0],dtype=float)
@@ -106,13 +107,13 @@ class BaseBoid(ABC):
         colliding_neighbours:set = set()
         avoiding_neighbours:set = set()
         for ob in self._boids:
-            if((calc_norm := norm(ob.position - self.position)) < params.visual_dist):
+            if((calc_norm := norm(ob.position - self.position)) < self.parameters.visual_dist):
                 local_average_vel += ob.velocity
                 local_average_pos += ob.position
                 self.logger.debug("Norm between boids: %s", calc_norm)
-                if calc_norm < 2*params.min_separation:
+                if calc_norm < 2*self.parameters.min_separation:
                     colliding_neighbours.add(ob)
-                elif calc_norm < params.avoid_dist:
+                elif calc_norm < self.parameters.avoid_dist:
                     avoiding_neighbours.add(ob)
                 else:
                     nearest_visual_neighbours.add(ob)
@@ -130,13 +131,13 @@ class BaseBoid(ABC):
         velocity such that it will start to make a turn from the wall with every
         time step
         """
-        if self.x < params.left_margin:
+        if self.x < self.parameters.left_margin:
             self.velocity[0] =  abs(self.velocity[0])
-        if self.x > params.right_margin:
+        if self.x > self.parameters.right_margin:
             self.velocity[0] = -abs(self.velocity[0])
-        if self.y > params.bottom_margin:
+        if self.y > self.parameters.bottom_margin:
             self.velocity[1] = -abs(self.velocity[1])
-        if self.y < params.top_margin:
+        if self.y < self.parameters.top_margin:
             self.velocity[1] = abs(self.velocity[1])
 
 
@@ -197,8 +198,9 @@ class BaseBoid(ABC):
 
 class BaseSpace(ABC):
     """Base class for all space implementations"""
-    def __init__(self, comm_strategy: CommunicationStrategy) -> None:
+    def __init__(self, comm_strategy: CommunicationStrategy, parameter_file_path: str = 'parameters/default.yaml') -> None:
         self.logger = logging.getLogger("boids.space")
+        self.parameters = Parameters(parameter_file_path)
         # Do not set level or add handlers here; handled by multiproc_logging
         self.boid_list: List[BaseBoid] = []
         self.comm = comm_strategy
@@ -240,7 +242,7 @@ class BaseSpace(ABC):
         dist = norm(delta_pos)
         
         # Check if overlapping (adjust threshold as needed)
-        if dist < 2 * params.min_separation:
+        if dist < 2 * self.parameters.min_separation:
             n = delta_pos / dist  # unit normal from b2 -> b1
             v_rel = b1.velocity - b2.velocity
             v_rel_n = np.dot(v_rel, n)

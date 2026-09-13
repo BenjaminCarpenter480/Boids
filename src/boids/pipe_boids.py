@@ -7,23 +7,24 @@ import threading
 
 from base_boids import BaseBoid, BaseSpace, BoidState, CommunicationStrategy
 from standard_boid import StandardBoid
-from parameters import Parameters as params
+from parameters import Parameters
 
 class PipeCommunication(CommunicationStrategy):
     """Pipe-based communication strategy"""
-    def __init__(self) -> None:
+    def __init__(self, parameter_file_path: str = 'parameters/default.yaml') -> None:
         self.pipe: BinaryIO | None = None
+        self.parameters = Parameters(parameter_file_path)
         self._setup_pipe()
 
     def _setup_pipe(self) -> None:
         try:
-            os.remove(params.PIPE)
+            os.remove(self.parameters.pipe)
         except FileNotFoundError:
             pass
 
         try:
-            os.mkfifo(params.PIPE)
-            self.pipe = open(params.PIPE, 'wb')
+            os.mkfifo(self.parameters.pipe)
+            self.pipe = open(self.parameters.pipe, 'wb')
             logging.info("Pipe created and opened")
         except OSError as e:
             logging.error("Error with pipe: %s", str(e))
@@ -44,7 +45,7 @@ class PipeCommunication(CommunicationStrategy):
         if self.pipe:
             self.pipe.close()
         try:
-            os.remove(params.PIPE)
+            os.remove(self.parameters.pipe)
         except FileNotFoundError:
             pass
 
@@ -55,11 +56,11 @@ class PipeSpace(BaseSpace):
         self.boid_list = [
             PipeBoid(
                 [],
-                randint(1, params.DOMAIN),
-                randint(1, params.DOMAIN),
+                randint(1, self.parameters.domain),
+                randint(1, self.parameters.domain),
                 random(),
                 random()
-            ) for _ in range(params.NUM_BOIDS)
+            ) for _ in range(self.parameters.num_boids)
         ]
         # Now assign the full boid list to each boid
         for boid in self.boid_list:
@@ -79,10 +80,11 @@ class PipeReadHandler():
     attributes in the form x,y,vx,vy
     """
 
-    def __init__(self, pipe_address=params.PIPE) -> None:
+    def __init__(self, parameter_file_path: str = 'parameters/default.yaml') -> None:
         """Class to handle reading from the pipe
         """
-        self.__pipe = open(pipe_address,"rb")
+        self.__parameters = Parameters(parameter_file_path)
+        self.__pipe = open(self.__parameters.pipe,"rb")
         self.__data = queue.Queue()
         self.__pipe_reader = threading.Thread(target=self.empty_pipe)
         self.__pipe_reader.start()

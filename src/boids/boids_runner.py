@@ -37,6 +37,7 @@ def boids_sim_thread_func(logger_queue) -> multiprocessing.Process:
     """Create and return a Process to run the boids simulation"""
     def sim_target():
         multiproc_logging.setup_worker_logging(logger_queue, "boids.space")
+        multiproc_logging.setup_worker_logging(logger_queue, "boids.parameters")
         multiproc_logging.setup_worker_logging(logger_queue, "boids.boid")
         comm = PipeCommunication()
         space = PipeSpace(comm)

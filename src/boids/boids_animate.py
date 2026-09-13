@@ -11,33 +11,34 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
-from parameters import Parameters as params
+from parameters import Parameters
 from pipe_boids import PipeReadHandler
 
 class BoidVisualiser():
     """
     Visualiser class to display boids on a plot using matplotlib
     """
-    def __init__(self) -> None:
+    def __init__(self, parameter_file_path: str = 'parameters/default.yaml') -> None:
         plt.close('all')
+        self.parameters = Parameters(parameter_file_path)
         self.fig, self.ax = plt.subplots()
-        self.ax.set_xlim(0, params.DOMAIN)
-        self.ax.set_ylim(0, params.DOMAIN)
+        self.ax.set_xlim(0, self.parameters.domain)
+        self.ax.set_ylim(0, self.parameters.domain)
         self.ani: Optional[animation.FuncAnimation] = None
 
         # Calculate the marker size based on the min_separation
         # From https://stackoverflow.com/a/65177849
-        marker_size = ((self.ax.transData.transform([params.min_separation/2,0])[0]
+        marker_size = ((self.ax.transData.transform([self.parameters.min_separation/2,0])[0]
                                 -self.ax.transData.transform([0,0])[0])**2*np.pi)
 
 
-        self.boid_scatter = self.ax.scatter(np.zeros(params.NUM_BOIDS),
-                                            np.zeros(params.NUM_BOIDS),
+        self.boid_scatter = self.ax.scatter(np.zeros(self.parameters.num_boids),
+                                            np.zeros(self.parameters.num_boids),
                                             s=marker_size,
-                                            c=np.random.randint(0, 255, params.NUM_BOIDS))
+                                            c=np.random.randint(0, 255, self.parameters.num_boids))
         self.ax.tick_params(left = False, right = False , labelleft = False , 
                 labelbottom = False, bottom = False)
-        self.pipe_access = PipeReadHandler(params.PIPE)
+        self.pipe_access = PipeReadHandler(self.parameters.pipe)
         self.logger = logging.getLogger("boids.visualiser")
 
 

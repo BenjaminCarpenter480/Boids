@@ -1,0 +1,21 @@
+    fps: 1/60
+    pipe: "/tmp/boids_pipe"
+    num_boids: 50
+
+    step_size: 1
+
+    domain: 8000
+
+    move_random_probability: 0.6
+    turn_speed: 1
+    randomness_factor: 20
+    move_away_factor: 0.4
+
+    visual_dist: 500
+    avoid_dist: 400
+    min_separation: 150
+
+    match_speed_factor: 0.6
+    centering_factor: 0
+    max_speed: 50
+    min_speed: 1
