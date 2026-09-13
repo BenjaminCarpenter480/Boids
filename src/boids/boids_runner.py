@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 import time
 import multiprocessing
 import multiproc_logging
@@ -12,18 +12,26 @@ def run_with_pygame() -> None:
     """Run simulation with pygame visualiser"""
     boids_sim("pygame")
 
+@boids_app.command(name="record")
+def record_with_matplotlib(
+    save_video: Optional[str] = typer.Option(None, "--save-video", "-s", help="Save animation as a video file"),
+    frames: int = typer.Option(1000, "--frames", "-f", help="Number of frames to record")
+) -> None:
+    """Record simulation with matplotlib visualiser"""
+    boids_sim("record", save_video=save_video, frames=frames)
+
 @boids_app.command(name="matplotlib")
-def run_with_matplotlib() -> None:
+def run_with_matplotlib(
+) -> None:
     """Run simulation with matplotlib visualiser"""
     boids_sim("matplotlib")
 
-def run_animation(logger_queue) -> None:
+def run_animation(logger_queue, save_video: Optional[str] = None, frames: Optional[int] = None) -> None:
     """Run the animation loop"""
     multiproc_logging.setup_worker_logging(logger_queue, "boids.visualiser")
     import boids_animate as bv
-    visualiser = bv.BoidVisualiser()
-    visualiser.animate()
-
+    visualiser =bv.BoidVisualiser()
+    visualiser.animate(save_video, frames)
 
 def boids_sim_thread_func(logger_queue) -> multiprocessing.Process:
     """Create and return a Process to run the boids simulation"""
@@ -36,8 +44,7 @@ def boids_sim_thread_func(logger_queue) -> multiprocessing.Process:
     process = multiprocessing.Process(target=sim_target)
     return process
 
-
-def boids_sim(visualiser: Literal["pygame", "matplotlib"]) -> None:
+def boids_sim(visualiser: Literal["pygame", "matplotlib", "record"], save_video: Optional[str] = None, frames: Optional[int] = None ) -> None:
     """Run the boids simulation with the specified visualiser"""
     logger_queue, logger_proc = multiproc_logging.start_logging_proc()
     runner_logger = multiproc_logging.setup_worker_logging(logger_queue, "boids.runner")
@@ -55,8 +62,13 @@ def boids_sim(visualiser: Literal["pygame", "matplotlib"]) -> None:
             visualiser_obj = ba.GameVisuliser()
             visualiser_obj.loop()
         else:
-            visualization_proc = multiprocessing.Process(target=run_animation, args=(logger_queue,))
-            visualization_proc.start()
+            if visualiser == "matplotlib":
+                visualization_proc = multiprocessing.Process(target=run_animation, args=(logger_queue,))
+                visualization_proc.start()
+
+            elif visualiser == "record":
+                visualization_proc = multiprocessing.Process(target=run_animation, args=(logger_queue, save_video, frames,))
+                visualization_proc.start()
 
             while True:
                 if not visualization_proc.is_alive():
@@ -66,6 +78,7 @@ def boids_sim(visualiser: Literal["pygame", "matplotlib"]) -> None:
                     runner_logger.info("Generator process ended")
                     break
                 time.sleep(0.25)
+
     except KeyboardInterrupt:
         runner_logger.info("Received keyboard interrupt, shutting down...")
     except Exception as e:  # pragma: no cover
