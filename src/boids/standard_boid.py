@@ -39,7 +39,7 @@ class StandardBoid(BaseBoid):
         diff_velocity_avoid = np.array([0,0],dtype=float)
 
         for ob in nearest_avoiding_neighbours:
-            diff_velocity_avoid += (self.position - ob.position)*params.move_away_factor
+            diff_velocity_avoid += (self.position - ob.position)*self.parameters.move_away_factor
 
         self.logger.debug("Velocity change due to avoidance away: %s", diff_velocity_avoid)
 
