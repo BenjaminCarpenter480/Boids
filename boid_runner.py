@@ -7,7 +7,7 @@ from pathlib import Path
 root_dir = Path(__file__).resolve().parent
 src_dir = root_dir / "src"
 boids_dir = src_dir / "boids"
-for path in (str(boids_dir), str(src_dir)):
+for path in (str(src_dir), str(boids_dir)):
     if path not in sys.path:
         sys.path.insert(0, path)
 

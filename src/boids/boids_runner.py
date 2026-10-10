@@ -62,13 +62,16 @@ def boids_sim(visualiser: Literal["pygame", "matplotlib", "record"], save_video:
     runner_logger = multiproc_logging.setup_worker_logging(logger_queue, "boids.runner")
     runner_logger.info("Starting boids simulation")
 
-    generator_proc = boids_sim_thread_func(logger_queue)
-    generator_proc.start()
-    time.sleep(2)
-
-    runner_logger.info("Starting visualization")
+    generator_proc = None
+    visualization_proc = None
 
     try:
+        generator_proc = boids_sim_thread_func(logger_queue)
+        generator_proc.start()
+        time.sleep(2)
+
+        runner_logger.info("Starting visualization")
+
         if visualiser == "pygame":
             import boids_game as ba
             visualiser_obj = ba.GameVisuliser()
@@ -96,11 +99,13 @@ def boids_sim(visualiser: Literal["pygame", "matplotlib", "record"], save_video:
     except Exception as e:  # pragma: no cover
         runner_logger.error(f"Error during simulation: {e}")
     finally:
-        if 'generator_proc' in locals() and generator_proc.is_alive():
+        if generator_proc is not None and generator_proc.is_alive():
+            generator_proc.terminate()
             generator_proc.join(timeout=3)
-        if 'visualization_proc' in locals() and visualization_proc.is_alive():
+        if visualization_proc is not None and visualization_proc.is_alive():
+            visualization_proc.terminate()
             visualization_proc.join(timeout=3)
-        if 'logger_queue' in locals() and 'logger_proc' in locals():
+        if logger_queue is not None and logger_proc is not None:
             multiproc_logging.stop_logging_proc(logger_queue, logger_proc)
 
 if __name__ == "__main__":
