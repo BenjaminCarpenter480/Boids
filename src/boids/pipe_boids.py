@@ -42,10 +42,13 @@ class PipeCommunication(CommunicationStrategy):
 
     def cleanup(self) -> None:
         if self.pipe:
-            self.pipe.close()
+            try:
+                self.pipe.close()
+            except OSError:
+                pass
         try:
             os.remove(params.PIPE)
-        except FileNotFoundError:
+        except OSError:
             pass
 
 class PipeSpace(BaseSpace):
@@ -84,15 +87,18 @@ class PipeReadHandler():
         """
         self.__pipe = open(pipe_address,"rb")
         self.__data = queue.Queue()
-        self.__pipe_reader = threading.Thread(target=self.empty_pipe)
+        self.__pipe_reader = threading.Thread(target=self.empty_pipe, daemon=True)
         self.__pipe_reader.start()
 
     def empty_pipe(self):
         """
         Read from the pipe and put the data in the queue to be accessed by the process
         """
-        while self.__pipe.readable():
-            self.__data.put(self.__pipe.readline())
+        while True:
+            line = self.__pipe.readline()
+            if not line:
+                break
+            self.__data.put(line)
 
     def get_data(self):
         """Data stored in the pipe
