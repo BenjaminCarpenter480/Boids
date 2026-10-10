@@ -221,6 +221,8 @@ class BaseSpace(ABC):
                     self.comm.write_state(boid.state)
 
                 self.comm.write_frame_end()
+        except (BrokenPipeError, KeyboardInterrupt):
+            pass
         finally:
             self.comm.cleanup()
 

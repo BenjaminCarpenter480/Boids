@@ -1,6 +1,16 @@
 from typing import Literal, Optional
 import time
 import multiprocessing
+import sys
+from pathlib import Path
+
+# Ensure src and src/boids are in sys.path for direct script and module execution
+_current_dir = Path(__file__).resolve().parent
+_src_dir = _current_dir.parent
+for _p in (str(_current_dir), str(_src_dir)):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
 import multiproc_logging
 import typer
 
@@ -33,15 +43,17 @@ def run_animation(logger_queue, save_video: Optional[str] = None, frames: Option
     visualiser =bv.BoidVisualiser()
     visualiser.animate(save_video, frames)
 
+def sim_target(logger_queue) -> None:
+    """Target function for simulation process"""
+    multiproc_logging.setup_worker_logging(logger_queue, "boids.space")
+    multiproc_logging.setup_worker_logging(logger_queue, "boids.boid")
+    comm = PipeCommunication()
+    space = PipeSpace(comm)
+    space.sim_loop()
+
 def boids_sim_thread_func(logger_queue) -> multiprocessing.Process:
     """Create and return a Process to run the boids simulation"""
-    def sim_target():
-        multiproc_logging.setup_worker_logging(logger_queue, "boids.space")
-        multiproc_logging.setup_worker_logging(logger_queue, "boids.boid")
-        comm = PipeCommunication()
-        space = PipeSpace(comm)
-        space.sim_loop()
-    process = multiprocessing.Process(target=sim_target)
+    process = multiprocessing.Process(target=sim_target, args=(logger_queue,))
     return process
 
 def boids_sim(visualiser: Literal["pygame", "matplotlib", "record"], save_video: Optional[str] = None, frames: Optional[int] = None ) -> None:
@@ -50,13 +62,16 @@ def boids_sim(visualiser: Literal["pygame", "matplotlib", "record"], save_video:
     runner_logger = multiproc_logging.setup_worker_logging(logger_queue, "boids.runner")
     runner_logger.info("Starting boids simulation")
 
-    generator_proc = boids_sim_thread_func(logger_queue)
-    generator_proc.start()
-    time.sleep(2)
-
-    runner_logger.info("Starting visualization")
+    generator_proc = None
+    visualization_proc = None
 
     try:
+        generator_proc = boids_sim_thread_func(logger_queue)
+        generator_proc.start()
+        time.sleep(2)
+
+        runner_logger.info("Starting visualization")
+
         if visualiser == "pygame":
             import boids_game as ba
             visualiser_obj = ba.GameVisuliser()
@@ -84,10 +99,14 @@ def boids_sim(visualiser: Literal["pygame", "matplotlib", "record"], save_video:
     except Exception as e:  # pragma: no cover
         runner_logger.error(f"Error during simulation: {e}")
     finally:
-        if generator_proc.is_alive():
+        if generator_proc is not None and generator_proc.is_alive():
+            generator_proc.terminate()
             generator_proc.join(timeout=3)
-        if 'visualization_proc' in locals() and visualization_proc.is_alive():
+        if visualization_proc is not None and visualization_proc.is_alive():
+            visualization_proc.terminate()
             visualization_proc.join(timeout=3)
+        if logger_queue is not None and logger_proc is not None:
+            multiproc_logging.stop_logging_proc(logger_queue, logger_proc)
 
 if __name__ == "__main__":
     boids_app()
